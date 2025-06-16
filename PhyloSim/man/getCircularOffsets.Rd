@@ -2,26 +2,67 @@
 % Please edit documentation in R/getCircularOffsets.R
 \name{getCircularOffsets}
 \alias{getCircularOffsets}
-\title{Compute toroidal neighbor shifts}
+\title{Compute coordinate offsets for circular neighborhoods}
 \usage{
 getCircularOffsets(radius)
 }
 \arguments{
-\item{radius}{Integer radius defining the circular neighborhood}
+\item{radius}{Numeric value specifying the radius of the circular neighborhood.
+Must be a positive number. The actual neighborhood will include all integer
+coordinate pairs (dx, dy) where sqrt(dx² + dy²) ≤ radius.}
 }
 \value{
-A data frame with columns \code{dx} and \code{dy} indicating x and y offsets
+A data frame with two integer columns:
+\describe{
+\item{dx}{X-coordinate offsets relative to center cell}
+\item{dy}{Y-coordinate offsets relative to center cell}
+}
+The center coordinate (0, 0) is excluded. Rows are ordered by x-offset,
+then by y-offset within each x-value.
 }
 \description{
-Computes relative coordinate offsets that define a circular neighborhood
-of a given radius around a central cell, excluding the center (0, 0). Used in conspecific
-neighborhood analysis on torus-expanded matrices.
+Calculates coordinate offsets for all cells within a circular neighborhood around a central cell,
+with a given radius matching the simulation's density cutoff distance.
+
+The simulation's densitycut parameter limits density-dependent effects to cells within this circular radius.
+This function identifies exactly those neighboring cells that would be affected by density effects
+in the simulation, generating all integer coordinate pairs within the specified radius (excluding
+the center cell itself).
+
+The radius definition is consistent with the simulation's C++ implementation.
 }
 \details{
 Get circular neighborhood coordinate offsets
+
+The algorithm iterates through all possible x-offsets from -radius to +radius,
+then for each x-offset, calculates the maximum y-offset that still falls within
+the circular boundary using the Pythagorean theorem: y_max = sqrt(radius² - x²).
 }
 \examples{
+# Small neighborhood (8 adjacent cells)
 getCircularOffsets(1)
-getCircularOffsets(3)
+#>   dx dy
+#> 1 -1 -1
+#> 2 -1  0
+#> 3 -1  1
+#> 4  0 -1
+#> 5  0  1
+#> 6  1 -1
+#> 7  1  0
+#> 8  1  1
 
+# Larger circular neighborhood
+offsets_r3 <- getCircularOffsets(3)
+nrow(offsets_r3)  # Number of cells in neighborhood
+#> [1] 28
+
+# Visualize the circular pattern
+plot(offsets_r3$dx, offsets_r3$dy, asp = 1, pch = 16,
+     main = "Circular neighborhood (radius = 3)",
+     xlab = "dx", ylab = "dy")
+points(0, 0, pch = 4, col = "red", cex = 2)  # Center point
+
+}
+\seealso{
+\code{\link{expand.grid}} for generating rectangular neighborhoods
 }

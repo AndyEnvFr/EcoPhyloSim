@@ -2,47 +2,83 @@
 #'
 #' @title Get number of conspecific neighbors
 #' @param simu Object of class \code{PhyloSim} or \code{PhylosimList}
-#' @return Input object with \code{conNeighMat} matrices added to all generations
-#' @description Calculates the number of conspecific neighbors in a circular radius 
-#' for all generations based on torus-expanded \code{specMat}. 
-#' Automatically calls \code{\link{getTorus}} with \code{overwrite = TRUE}, 
-#' which also prepares \code{idMat} and \code{mortMat} if missing.
+#' @return Input object with \code{conNeighMat} matrices added to all generations.
+#'   Each \code{conNeighMat} contains integer counts of conspecific neighbors
+#'   for every cell in the simulation grid.
+#' @description 
+#' Calculates the number of conspecific neighbors within a circular neighborhood
+#' for all generations in a simulation. The neighborhood radius
+#' is defined by the \code{densityCut} parameter from the simulation model.
+#' Conspecific neighbors are cells containing individuals of the same species
+#' as the focal cell.
 #' 
-#' The torus is automatically undone after computing neighborhood matrices.
-#'
+#' The function uses circular neighborhoods as defined by 
+#' \code{\link{getCircularOffsets}}, which generates coordinate offsets
+#' for all cells within the specified radius distance from each focal cell.
+#' 
+#' @details
+#' The function operates by:
+#' \enumerate{
+#'   \item Expanding all matrices to torus topology (periodic boundary conditions)
+#'   \item For each generation, counting conspecific neighbors using circular offsets
+#'   \item Cropping all matrices back to original dimensions
+#'   \item Preparing missing \code{idMat} and \code{mortMat} by calling 
+#'         \code{getID} and \code{getMortality} functions if needed
+#' }
+#' 
+#' The torus expansion ensures that edge effects are minimized by treating
+#' the simulation grid as if it wraps around at the boundaries. After
+#' neighborhood calculations are complete, all matrices are automatically
+#' cropped back to their original dimensions.
+#' 
+#' @seealso 
+#' \code{\link{getCircularOffsets}} for the neighborhood definition used
+#' \code{\link{getID}} for extraction of ID
+#' \code{\link{getMortality}} for extraction of mortalities
+#' 
+#' @examples
+#' \dontrun{
+#' # Apply to single simulation
+#' simu_with_neighbors <- getConNeigh(my_simulation)
+#' 
+#' # Check neighborhood matrix for first generation
+#' head(simu_with_neighbors$Output[[1]]$conNeighMat)
+#' 
+#' # Apply to list of simulations
+#' simu_list_with_neighbors <- getConNeigh(my_simulation_list)
+#' }
+#' 
 #' @export
 getConNeigh <- function(simu) {
   UseMethod("getConNeigh")
 }
-
 #' @rdname getConNeigh
 #' @method getConNeigh PhyloSim
 #' @export
 getConNeigh.PhyloSim <- function(simu) {
-  simu <- getTorus(simu, overwrite = TRUE)
+  simu <- getTorus(simu, overwrite = TRUE) # overwrite reduces object size. Smaller matrices are replaced by bigger.
   
-  radius <- simu$Model$densityCut
-  offsets <- getCircularOffsets(radius)
+  r <- simu$Model$densityCut # densityCut defines the radius
+  offsets <- getCircularOffsets(r) # get the relative coordinates of neighbors. Later used for matrix shifts.
   
-  r <- radius
-  lx <- nrow(simu$Output[[1]]$specMat)
+  lx <- nrow(simu$Output[[1]]$specMat) # get dimensions of landscape
   ly <- ncol(simu$Output[[1]]$specMat)
   
-  census <- names(simu$Output)
+  census <- names(simu$Output) # names are present, because getTorus calls getMortality, which generates names
   for (cen in census) {
     sx <- c(r + 1, lx - r)
     sy <- c(r + 1, ly - r)
-    con <- matrix(0, lx - 2 * r, ly - 2 * r)
-    inner <- simu$Output[[cen]]$specMat[sx[1]:sx[2], sy[1]:sy[2]]
+    con <- matrix(0, lx - 2 * r, ly - 2 * r) # create a matrix to store conspecific numbers. Same size as inner matrix.
+    inner <- simu$Output[[cen]]$specMat[sx[1]:sx[2], sy[1]:sy[2]] # get the focal species matrix to detect if neighbor is con or het
     
     for (xy in seq_len(nrow(offsets))) {
-      xshift <- offsets$dx[xy]
+      xshift <- offsets$dx[xy] # loops through all nieghbors calculated by getCircularOffsets
       yshift <- offsets$dy[xy]
       X <- sx + xshift
       Y <- sy + yshift
       shifted <- simu$Output[[cen]]$specMat[X[1]:X[2], Y[1]:Y[2]]
-      con <- con + ifelse(shifted == inner, 1, 0)
-    }
+      con <- con + ifelse(shifted == inner, 1, 0) # if the focal species == the shifted, a + 1 is added to the position of the focal species
+    } # step is repeated so +1 can add up to max nrow(offsets) neighbors
     
     simu$Output[[cen]]$conNeighMat <- con
   }
@@ -57,7 +93,6 @@ getConNeigh.PhyloSim <- function(simu) {
   
   return(simu)
 }
-
 #' @rdname getConNeigh
 #' @method getConNeigh PhylosimList
 #' @export

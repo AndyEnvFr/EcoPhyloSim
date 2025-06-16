@@ -16,16 +16,53 @@ getConNeigh(simu)
 \item{simu}{Object of class \code{PhyloSim} or \code{PhylosimList}}
 }
 \value{
-Input object with \code{conNeighMat} matrices added to all generations
+Input object with \code{conNeighMat} matrices added to all generations.
+Each \code{conNeighMat} contains integer counts of conspecific neighbors
+for every cell in the simulation grid.
 }
 \description{
-Calculates the number of conspecific neighbors in a circular radius
-for all generations based on torus-expanded \code{specMat}.
-Automatically calls \code{\link{getTorus}} with \code{overwrite = TRUE},
-which also prepares \code{idMat} and \code{mortMat} if missing.
+Calculates the number of conspecific neighbors within a circular neighborhood
+for all generations in a simulation. The neighborhood radius
+is defined by the \code{densityCut} parameter from the simulation model.
+Conspecific neighbors are cells containing individuals of the same species
+as the focal cell.
 
-The torus is automatically undone after computing neighborhood matrices.
+The function uses circular neighborhoods as defined by
+\code{\link{getCircularOffsets}}, which generates coordinate offsets
+for all cells within the specified radius distance from each focal cell.
 }
 \details{
 Calculate conspecific neighborhood matrices
+
+The function operates by:
+\enumerate{
+\item Expanding all matrices to torus topology (periodic boundary conditions)
+\item For each generation, counting conspecific neighbors using circular offsets
+\item Cropping all matrices back to original dimensions
+\item Preparing missing \code{idMat} and \code{mortMat} by calling
+\code{getID} and \code{getMortality} functions if needed
+}
+
+The torus expansion ensures that edge effects are minimized by treating
+the simulation grid as if it wraps around at the boundaries. After
+neighborhood calculations are complete, all matrices are automatically
+cropped back to their original dimensions.
+}
+\examples{
+\dontrun{
+# Apply to single simulation
+simu_with_neighbors <- getConNeigh(my_simulation)
+
+# Check neighborhood matrix for first generation
+head(simu_with_neighbors$Output[[1]]$conNeighMat)
+
+# Apply to list of simulations
+simu_list_with_neighbors <- getConNeigh(my_simulation_list)
+}
+
+}
+\seealso{
+\code{\link{getCircularOffsets}} for the neighborhood definition used
+\code{\link{getID}} for extraction of ID
+\code{\link{getMortality}} for extraction of mortalities
 }

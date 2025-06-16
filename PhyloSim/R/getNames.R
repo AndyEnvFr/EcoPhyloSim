@@ -25,7 +25,7 @@
 #' }
 #'
 #' Example name:
-#' \code{ddT5_dispG_sr0.01_eT2_fbmr0.5_dc10_fao1_fi0.1_rq0.3_rqs0.2_p3}
+#' \code{ddT0.5_dispG_sr2_eT0.8_fbmr10_dc4_fao1_fi0.1_rq0.3_rqs0.2_p3}
 #'
 #' @examples
 #' \dontrun{
@@ -41,17 +41,17 @@ getNames <- function(runs) {
   sapply(runs, function(x) {
     m <- x$Model
     paste0(
-      if (isTRUE(m$density)) paste0("dd", m$compStrength, "_"),
+      if (isTRUE(m$density)) paste0("dd", m$compStrength, "_"), # only return the abbreviations if the parameter is turned on !
       "disp", ifelse(m$dispersal == "global", "G_", paste0(m$dispersal,"_")),
       "sr", paste0(m$specRate,"_"),
-      if (isTRUE(m$environment)) paste0("e", m$envStrength, "_"),
+      if (isTRUE(m$environment)) paste0("e", m$envStrength, "_"), # only return the abbreviations if the parameter is turned on !
       "fbmr", paste0(m$fitnessBaseMortalityRatio,"_"),
       "dc", paste0(m$densityCut,"_"),
       "fao", ifelse(m$fitnessActsOn == "mortality", "M_", "R_"),
-      if (m$fission != 0) paste0("fi", m$fission, "_"),
-      if (m$redQueen != 0) paste0("rq", m$redQueen, "_"),
-      if (m$redQueenStrength != 0) paste0("rqs", m$redQueenStrength, "_"),
-      if (m$protracted != 0) paste0("p", m$protracted, "_")
+      if (m$fission != 0) paste0("fi", m$fission, "_"), # only return the abbreviations if the parameter is turned on !
+      if (m$redQueen != 0) paste0("rq", m$redQueen, "_"), # only return the abbreviations if the parameter is turned on !
+      if (m$redQueenStrength != 0) paste0("rqs", m$redQueenStrength, "_"), # only return the abbreviations if the parameter is turned on !
+      if (m$protracted != 0) paste0("p", m$protracted, "_") # only return the abbreviations if the parameter is turned on !
     )
   })
 }

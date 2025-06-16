@@ -38,7 +38,7 @@ The following abbreviations and encodings are used in the generated names:
 }
 
 Example name:
-\code{ddT5_dispG_sr0.01_eT2_fbmr0.5_dc10_fao1_fi0.1_rq0.3_rqs0.2_p3}
+\code{ddT0.5_dispG_sr2_eT0.8_fbmr10_dc4_fao1_fi0.1_rq0.3_rqs0.2_p3}
 }
 \examples{
 \dontrun{

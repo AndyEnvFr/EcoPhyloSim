@@ -16,7 +16,7 @@ getMortality(simu)
 \item{simu}{Object of class \code{PhyloSim} or \code{PhylosimList}}
 }
 \value{
-Same object, with \code{mortMat} matrices added to \code{Output[[i]]}
+Same object, with \code{mortMat} matrices added to \code{Output[[i]]}. Also, adds the years of generations (e.g., \code{simu$Output$test$Output$`98`}.
 }
 \description{
 Compares each generation's \code{traitMat} to the next. If the trait

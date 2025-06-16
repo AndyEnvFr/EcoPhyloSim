@@ -16,7 +16,7 @@ getID(simu)
 \item{simu}{Object of class \code{PhyloSim} or \code{PhylosimList}}
 }
 \value{
-Input object with \code{idMat} matrices added to each generation
+Input object with \code{idMat} matrices added to each generation.  Also, adds the years of generations (e.g., \code{simu$Output$test$Output$`98`}.
 }
 \description{
 Each individual gets a persistent ID. IDs are unique per run.

@@ -5,7 +5,7 @@
 #' @param overwrite Logical; if \code{TRUE}, original matrices will be overwritten
 #' @param radius Integer; neighborhood radius. Defaults to \code{densityCut}
 #' @return Input object with torus-expanded matrices added or replaced
-#' @description Adds torus-padding to all relevant matrices. By default, generates \code{mortMat} and \code{idMat} if missing.
+#' @description Adds torus-padding to all relevant matrices mainly to examine nieghbors also of edge cases. This can be done, because the simulation in c++ also uses toroidal boundaries. By default, generates \code{mortMat} and \code{idMat} if missing.
 #' Names generations based on \code{Model$runs}.
 #'
 getTorus <- function(simu, overwrite = FALSE, radius = NULL) {
@@ -14,14 +14,14 @@ getTorus <- function(simu, overwrite = FALSE, radius = NULL) {
 
 #' @rdname getTorus
 #' @method getTorus PhyloSim
-getTorus.PhyloSim <- function(simu, overwrite = FALSE, radius = NULL) {
-  r <- if (is.null(radius)) simu$Model$densityCut else radius
+getTorus.PhyloSim <- function(simu, overwrite = TRUE, radius = NULL) {
+  r <- if (is.null(radius)) simu$Model$densityCut else radius # by default take density cut as the radius
   
   if (!is.matrix(simu$Output[[1]]$mortMat)) {
-    simu <- getMortality(simu)
+    simu <- getMortality(simu) # adds mortalities and generation names to simu$Output$__generationName_
   }
   if (!is.matrix(simu$Output[[1]]$idMat)) {
-    simu <- getID(simu)
+    simu <- getID(simu) # adds ID matrix
   }
   
   names(simu$Output) <- as.character(simu$Model$runs)
@@ -30,9 +30,9 @@ getTorus.PhyloSim <- function(simu, overwrite = FALSE, radius = NULL) {
     for (matname in c("specMat", "traitMat", "envMat", "compMat", "neutMat", "mortMat", "idMat")) {
       original <- simu$Output[[i]][[matname]]
       padded <- getTorusMatrix(original, r)
-      if (overwrite) {
+      if (overwrite) { # be default replaces the old matrix with the new bigger one 
         simu$Output[[i]][[matname]] <- padded
-      } else {
+      } else { # consumes more space, keeps small and big matrix
         simu$Output[[i]][[paste0(matname, "Big")]] <- padded
       }
     }
@@ -51,18 +51,18 @@ getTorus.PhylosimList <- function(simu, overwrite = FALSE, radius = NULL) {
 #' @param r Radius to expand
 #' @return Expanded matrix with toroidal wrapping
 #' @keywords internal
-getTorusMatrix <- function(mat, r) {
+getTorusMatrix <- function(mat, r) { # internal function is called within getTorus
   mrow <- nrow(mat)
   mcol <- ncol(mat)
-  mbig <- matrix(NA, mrow + 2 * r, mcol + 2 * r)
+  mbig <- matrix(NA, mrow + 2 * r, mcol + 2 * r) # creates big torus Matrix
   
-  sr <- r + 1
+  sr <- r + 1 # based on the radius enlargen the matrix
   er <- mrow + r
   sc <- r + 1
   ec <- mcol + r
   
-  mbig[sr:er, sc:ec] <- mat
-  mbig[1:r, sc:ec] <- mat[(mrow - r + 1):mrow, ]
+  mbig[sr:er, sc:ec] <- mat # copies small matrix
+  mbig[1:r, sc:ec] <- mat[(mrow - r + 1):mrow, ] # adds alle edges and corners to enlargen the matrix
   mbig[(er + 1):(er + r), sc:ec] <- mat[1:r, ]
   mbig[sr:er, 1:r] <- mat[, (mcol - r + 1):mcol]
   mbig[sr:er, (ec + 1):(ec + r)] <- mat[, 1:r]

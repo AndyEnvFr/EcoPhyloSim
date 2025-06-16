@@ -4,7 +4,7 @@
 \alias{getMatToTab}
 \alias{getMatToTab.PhyloSim}
 \alias{getMatToTab.PhylosimList}
-\title{Extract matrices as long-format table}
+\title{Extract Matrices as Long-Format Table}
 \usage{
 getMatToTab(simu)
 
@@ -16,20 +16,20 @@ getMatToTab(simu)
 \item{simu}{Object of class \code{PhyloSim} or \code{PhylosimList}}
 }
 \value{
-A \code{data.frame} with census, individual ID, species ID, mortality, and conspecific count
+A \code{data.frame} with census, individual ID, species ID, mortality status, and conspecific count
 }
 \description{
 Extracts key spatial matrices (ID, species, mortality, conspecific neighborhood)
-from all available generations of a simulation object and flattens them into a tabular format
+from all available generations of a simulation object and converts them to a tabular format
 suitable for statistical analysis.
 
 The output table includes:
 \itemize{
-\item \code{census} – generation label
-\item \code{ind_id} – individual ID from \code{idMat}
-\item \code{spec_id} – species ID from \code{specMat}
-\item \code{mort} – mortality status from the next generation's \code{mortMat}
-\item \code{con} – number of conspecific neighbors from \code{conNeighMat}
+\item \code{census} - Generation label (current generation)
+\item \code{indId} - Individual ID from \code{idMat} (current generation)
+\item \code{specId} - Species ID from \code{specMat} (current generation)
+\item \code{mortNextGen} - Mortality status from the NEXT generation's \code{mortMat}
+\item \code{con} - Number of conspecific neighbors from \code{conNeighMat} (current generation)
 }
 }
 \details{
@@ -37,6 +37,11 @@ Convert simulation matrices to long-format table
 
 The input must be preprocessed using \code{\link{getConNeigh}}, which automatically computes and
 assigns the required matrices (\code{idMat}, \code{mortMat}, \code{conNeighMat}).
+
+Note: All values except mortality status refer to the current generation. Mortality status
+is pulled from the subsequent generation's mortality matrix, representing whether each
+individual survived to the next time step.
+
 All available generations will be included in the tabular output, regardless of spacing or pattern.
 }
 \seealso{
