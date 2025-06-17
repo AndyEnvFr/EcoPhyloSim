@@ -1,57 +1,74 @@
-#' Generate simulation names for a PhylosimList
+#' Generate simulation names based on model parameters
 #'
-#' @title Generate simulation names for a PhylosimList
-#' @param runs Object of class \code{PhylosimList}
-#' @return A character vector of names, one for each simulation in the list
-#' @description Constructs standardized names for a list of simulations based on model parameters.
-#' These names are useful for labeling and comparing simulation outputs systematically.
+#' @title Generate simulation names for simulation objects
+#' @param runs Object of class \code{PhyloSim} or \code{PhylosimList}
+#' @return Character vector of names (length 1 for PhyloSim, or 1 per element for PhylosimList)
+#' @description Constructs standardized names based on model parameters for consistent labeling.
+#' 
+#' See details for abbreviation rules.
+#'
 #' @details
-#' The following abbreviations and encodings are used in the generated names:
-#'
 #' \itemize{
-#'   \item \code{ddT}: Density dependence is enabled.
-#'   \item \code{compStrength}: Competition strength (numeric, appended after ddT).
-#'   \item \code{_dispX}: Dispersal type; \code{X} is \code{G} for global or the specific dispersal value.
-#'   \item \code{_sr}: Speciation rate.
-#'   \item \code{_eT}: Environment dependence is enabled.
-#'   \item \code{envStrength}: Environmental effect strength (numeric, appended after _eT).
-#'   \item \code{_fbmr}: Fitness-based mortality ratio.
-#'   \item \code{_dc}: Density cutoff.
-#'   \item \code{_fao}: Fitness acts on (e.g., birth, death).
-#'   \item \code{_fi}: Fission probability or intensity (only shown if > 0).
-#'   \item \code{_rq}: Red Queen effect parameter (only shown if > 0).
-#'   \item \code{_rqs}: Red Queen strength (only shown if > 0).
-#'   \item \code{_p}: Protracted speciation delay (only shown if > 0).
+#'   \item \code{ddX}: Density dependence with competition strength X
+#'   \item \code{dispX}: Dispersal type, X is G or numeric
+#'   \item \code{srX}: Speciation rate
+#'   \item \code{eX}: Environment dependence with strength X
+#'   \item \code{fbmrX}: Fitness-based mortality ratio
+#'   \item \code{dcX}: Density cutoff
+#'   \item \code{faoX}: Fitness acts on (M = mortality, R = reproduction)
+#'   \item \code{fiX}, \code{rqX}, \code{rqsX}, \code{pX}: Optional parameters if > 0
 #' }
-#'
-#' Example name:
-#' \code{ddT0.5_dispG_sr2_eT0.8_fbmr10_dc4_fao1_fi0.1_rq0.3_rqs0.2_p3}
 #'
 #' @examples
 #' \dontrun{
-#'   names(my_PhyloSim_list) <- getNames(my_PhyloSim_list)
+#' # For list of simulations
+#' names(my_PhyloSim_list) <- getNames(my_PhyloSim_list)
+#' my_PhyloSim_list[[1]]$Model$getName  # each object now stores its name
+#'
+#' # For single simulation
+#' my_simulation$Model$getName <- getNames(my_simulation)
 #' }
+#'
 #' @seealso \code{\link{PhyloSim}}
 #' @export
 getNames <- function(runs) {
-  if (!inherits(runs, "PhylosimList")) {
-    stop("Input must be of class 'PhylosimList'")
+  UseMethod("getNames")
+}
+
+#' @rdname getNames
+#' @method getNames PhyloSim
+#' @export
+getNames.PhyloSim <- function(runs) {
+  m <- runs$Model
+  name <- paste0(
+    if (isTRUE(m$density)) paste0("dd", m$compStrength, "_"),
+    "disp", ifelse(m$dispersal == "global", "G_", paste0(m$dispersal, "_")),
+    "sr", m$specRate, "_",
+    if (isTRUE(m$environment)) paste0("e", m$envStrength, "_"),
+    "fbmr", m$fitnessBaseMortalityRatio, "_",
+    "dc", m$densityCut, "_",
+    "fao", ifelse(m$fitnessActsOn == "mortality", "M", "R"),
+    if (m$fission > 0) paste0("_fi", m$fission),
+    if (m$redQueen > 0) paste0("_rq", m$redQueen),
+    if (m$redQueenStrength > 0) paste0("_rqs", m$redQueenStrength),
+    if (m$protracted > 0) paste0("_p", m$protracted)
+  )
+  return(name)
+}
+
+#' @rdname getNames
+#' @method getNames PhylosimList
+#' @export
+getNames.PhylosimList <- function(runs) {
+  names <- sapply(runs, function(x) {
+    name <- getNames(x)
+    x$Model$getName <- name
+    name
+  })
+  
+  for (i in seq_along(runs)) {
+    runs[[i]]$Model$getName <- names[i]
   }
   
-  sapply(runs, function(x) {
-    m <- x$Model
-    paste0(
-      if (isTRUE(m$density)) paste0("dd", m$compStrength, "_"), # only return the abbreviations if the parameter is turned on !
-      "disp", ifelse(m$dispersal == "global", "G_", paste0(m$dispersal,"_")),
-      "sr", paste0(m$specRate,"_"),
-      if (isTRUE(m$environment)) paste0("e", m$envStrength, "_"), # only return the abbreviations if the parameter is turned on !
-      "fbmr", paste0(m$fitnessBaseMortalityRatio,"_"),
-      "dc", paste0(m$densityCut,"_"),
-      "fao", ifelse(m$fitnessActsOn == "mortality", "M_", "R_"),
-      if (m$fission != 0) paste0("fi", m$fission, "_"), # only return the abbreviations if the parameter is turned on !
-      if (m$redQueen != 0) paste0("rq", m$redQueen, "_"), # only return the abbreviations if the parameter is turned on !
-      if (m$redQueenStrength != 0) paste0("rqs", m$redQueenStrength, "_"), # only return the abbreviations if the parameter is turned on !
-      if (m$protracted != 0) paste0("p", m$protracted, "_") # only return the abbreviations if the parameter is turned on !
-    )
-  })
+  return(names)
 }

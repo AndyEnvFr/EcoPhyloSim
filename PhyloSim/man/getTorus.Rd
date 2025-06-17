@@ -8,7 +8,7 @@
 \usage{
 getTorus(simu, overwrite = FALSE, radius = NULL)
 
-\method{getTorus}{PhyloSim}(simu, overwrite = FALSE, radius = NULL)
+\method{getTorus}{PhyloSim}(simu, overwrite = TRUE, radius = NULL)
 
 \method{getTorus}{PhylosimList}(simu, overwrite = FALSE, radius = NULL)
 }
@@ -23,7 +23,7 @@ getTorus(simu, overwrite = FALSE, radius = NULL)
 Input object with torus-expanded matrices added or replaced
 }
 \description{
-Adds torus-padding to all relevant matrices. By default, generates \code{mortMat} and \code{idMat} if missing.
+Adds torus-padding to all relevant matrices mainly to examine nieghbors also of edge cases. This can be done, because the simulation in c++ also uses toroidal boundaries. By default, generates \code{mortMat} and \code{idMat} if missing.
 Names generations based on \code{Model$runs}.
 }
 \details{

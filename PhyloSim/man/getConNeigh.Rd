@@ -52,12 +52,12 @@ cropped back to their original dimensions.
 \dontrun{
 # Apply to single simulation
 simu_with_neighbors <- getConNeigh(my_simulation)
-
-# Check neighborhood matrix for first generation
-head(simu_with_neighbors$Output[[1]]$conNeighMat)
+my_simulation$Model$getName <- getNames(my_simulation)
 
 # Apply to list of simulations
 simu_list_with_neighbors <- getConNeigh(my_simulation_list)
+names(simu_list_with_neighbors) <- getNames(simu_list_with_neighbors)
+simu_list_with_neighbors[[1]]$Model$getName
 }
 
 }

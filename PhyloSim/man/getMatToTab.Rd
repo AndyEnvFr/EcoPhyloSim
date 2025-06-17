@@ -16,7 +16,8 @@ getMatToTab(simu)
 \item{simu}{Object of class \code{PhyloSim} or \code{PhylosimList}}
 }
 \value{
-A \code{data.frame} with census, individual ID, species ID, mortality status, and conspecific count
+A \code{data.frame} with census, individual ID, species ID, mortality status,
+conspecific count, and simulation parameter label (\code{params})
 }
 \description{
 Extracts key spatial matrices (ID, species, mortality, conspecific neighborhood)
@@ -26,23 +27,21 @@ suitable for statistical analysis.
 The output table includes:
 \itemize{
 \item \code{census} - Generation label (current generation)
-\item \code{indId} - Individual ID from \code{idMat} (current generation)
-\item \code{specId} - Species ID from \code{specMat} (current generation)
+\item \code{indId} - Individual ID from \code{idMat}
+\item \code{specId} - Species ID from \code{specMat}
 \item \code{mortNextGen} - Mortality status from the NEXT generation's \code{mortMat}
-\item \code{con} - Number of conspecific neighbors from \code{conNeighMat} (current generation)
+\item \code{con} - Number of conspecific neighbors from \code{conNeighMat}
+\item \code{params} - Parameter string label from \code{Model$getName}
 }
 }
 \details{
 Convert simulation matrices to long-format table
 
-The input must be preprocessed using \code{\link{getConNeigh}}, which automatically computes and
+The input must be preprocessed using \code{\link{getConNeigh}}, which computes and
 assigns the required matrices (\code{idMat}, \code{mortMat}, \code{conNeighMat}).
 
-Note: All values except mortality status refer to the current generation. Mortality status
-is pulled from the subsequent generation's mortality matrix, representing whether each
-individual survived to the next time step.
-
-All available generations will be included in the tabular output, regardless of spacing or pattern.
+Note: All values except mortality refer to the current generation. Mortality status
+is pulled from the subsequent generation.
 }
 \seealso{
 \code{\link{getConNeigh}}, \code{\link{getMortality}}, \code{\link{getID}}, \code{\link{getTorus}}

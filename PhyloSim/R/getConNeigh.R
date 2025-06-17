@@ -40,50 +40,53 @@
 #' \dontrun{
 #' # Apply to single simulation
 #' simu_with_neighbors <- getConNeigh(my_simulation)
-#' 
-#' # Check neighborhood matrix for first generation
-#' head(simu_with_neighbors$Output[[1]]$conNeighMat)
+#' my_simulation$Model$getName <- getNames(my_simulation)
 #' 
 #' # Apply to list of simulations
 #' simu_list_with_neighbors <- getConNeigh(my_simulation_list)
+#' names(simu_list_with_neighbors) <- getNames(simu_list_with_neighbors)
+#' simu_list_with_neighbors[[1]]$Model$getName
 #' }
 #' 
 #' @export
 getConNeigh <- function(simu) {
   UseMethod("getConNeigh")
 }
+
 #' @rdname getConNeigh
 #' @method getConNeigh PhyloSim
 #' @export
 getConNeigh.PhyloSim <- function(simu) {
-  simu <- getTorus(simu, overwrite = TRUE) # overwrite reduces object size. Smaller matrices are replaced by bigger.
+  # Add name to Model$getName for downstream tracking
+  simu$Model$getName <- getNames(simu)
   
-  r <- simu$Model$densityCut # densityCut defines the radius
-  offsets <- getCircularOffsets(r) # get the relative coordinates of neighbors. Later used for matrix shifts.
+  simu <- getTorus(simu, overwrite = TRUE)
   
-  lx <- nrow(simu$Output[[1]]$specMat) # get dimensions of landscape
+  r <- simu$Model$densityCut
+  offsets <- getCircularOffsets(r)
+  
+  lx <- nrow(simu$Output[[1]]$specMat)
   ly <- ncol(simu$Output[[1]]$specMat)
   
-  census <- names(simu$Output) # names are present, because getTorus calls getMortality, which generates names
+  census <- names(simu$Output)
   for (cen in census) {
     sx <- c(r + 1, lx - r)
     sy <- c(r + 1, ly - r)
-    con <- matrix(0, lx - 2 * r, ly - 2 * r) # create a matrix to store conspecific numbers. Same size as inner matrix.
-    inner <- simu$Output[[cen]]$specMat[sx[1]:sx[2], sy[1]:sy[2]] # get the focal species matrix to detect if neighbor is con or het
+    con <- matrix(0, lx - 2 * r, ly - 2 * r)
+    inner <- simu$Output[[cen]]$specMat[sx[1]:sx[2], sy[1]:sy[2]]
     
     for (xy in seq_len(nrow(offsets))) {
-      xshift <- offsets$dx[xy] # loops through all nieghbors calculated by getCircularOffsets
+      xshift <- offsets$dx[xy]
       yshift <- offsets$dy[xy]
       X <- sx + xshift
       Y <- sy + yshift
       shifted <- simu$Output[[cen]]$specMat[X[1]:X[2], Y[1]:Y[2]]
-      con <- con + ifelse(shifted == inner, 1, 0) # if the focal species == the shifted, a + 1 is added to the position of the focal species
-    } # step is repeated so +1 can add up to max nrow(offsets) neighbors
+      con <- con + ifelse(shifted == inner, 1, 0)
+    }
     
     simu$Output[[cen]]$conNeighMat <- con
   }
   
-  # Undo torus for all matrices
   crop <- function(mat) mat[(r + 1):(lx - r), (r + 1):(ly - r)]
   for (i in seq_along(simu$Output)) {
     for (mat in c("specMat", "traitMat", "envMat", "compMat", "neutMat", "mortMat", "idMat")) {
@@ -93,9 +96,13 @@ getConNeigh.PhyloSim <- function(simu) {
   
   return(simu)
 }
+
 #' @rdname getConNeigh
 #' @method getConNeigh PhylosimList
 #' @export
-getConNeigh.PhylosimList <- function(simu) {
-  structure(lapply(simu, getConNeigh), class = "PhylosimList")
+getConNeigh.PhylosimList <- function(simu){
+  processed_list <- lapply(simu, getConNeigh)
+  class(processed_list) <- "PhylosimList"
+  names(processed_list) <- getNames(processed_list)
+  return(processed_list)
 }

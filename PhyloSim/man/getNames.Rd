@@ -2,48 +2,51 @@
 % Please edit documentation in R/getNames.R
 \name{getNames}
 \alias{getNames}
-\title{Generate simulation names for a PhylosimList}
+\alias{getNames.PhyloSim}
+\alias{getNames.PhylosimList}
+\title{Generate simulation names for simulation objects}
 \usage{
 getNames(runs)
+
+\method{getNames}{PhyloSim}(runs)
+
+\method{getNames}{PhylosimList}(runs)
 }
 \arguments{
-\item{runs}{Object of class \code{PhylosimList}}
+\item{runs}{Object of class \code{PhyloSim} or \code{PhylosimList}}
 }
 \value{
-A character vector of names, one for each simulation in the list
+Character vector of names (length 1 for PhyloSim, or 1 per element for PhylosimList)
 }
 \description{
-Constructs standardized names for a list of simulations based on model parameters.
-These names are useful for labeling and comparing simulation outputs systematically.
+Constructs standardized names based on model parameters for consistent labeling.
+
+See details for abbreviation rules.
 }
 \details{
-Generate simulation names for a PhylosimList
-
-The following abbreviations and encodings are used in the generated names:
+Generate simulation names based on model parameters
 
 \itemize{
-\item \code{ddT}: Density dependence is enabled.
-\item \code{compStrength}: Competition strength (numeric, appended after ddT).
-\item \code{_dispX}: Dispersal type; \code{X} is \code{G} for global or the specific dispersal value.
-\item \code{_sr}: Speciation rate.
-\item \code{_eT}: Environment dependence is enabled.
-\item \code{envStrength}: Environmental effect strength (numeric, appended after _eT).
-\item \code{_fbmr}: Fitness-based mortality ratio.
-\item \code{_dc}: Density cutoff.
-\item \code{_fao}: Fitness acts on (e.g., birth, death).
-\item \code{_fi}: Fission probability or intensity (only shown if > 0).
-\item \code{_rq}: Red Queen effect parameter (only shown if > 0).
-\item \code{_rqs}: Red Queen strength (only shown if > 0).
-\item \code{_p}: Protracted speciation delay (only shown if > 0).
+\item \code{ddX}: Density dependence with competition strength X
+\item \code{dispX}: Dispersal type, X is G or numeric
+\item \code{srX}: Speciation rate
+\item \code{eX}: Environment dependence with strength X
+\item \code{fbmrX}: Fitness-based mortality ratio
+\item \code{dcX}: Density cutoff
+\item \code{faoX}: Fitness acts on (M = mortality, R = reproduction)
+\item \code{fiX}, \code{rqX}, \code{rqsX}, \code{pX}: Optional parameters if > 0
 }
-
-Example name:
-\code{ddT0.5_dispG_sr2_eT0.8_fbmr10_dc4_fao1_fi0.1_rq0.3_rqs0.2_p3}
 }
 \examples{
 \dontrun{
-  names(my_PhyloSim_list) <- getNames(my_PhyloSim_list)
+# For list of simulations
+names(my_PhyloSim_list) <- getNames(my_PhyloSim_list)
+my_PhyloSim_list[[1]]$Model$getName  # each object now stores its name
+
+# For single simulation
+my_simulation$Model$getName <- getNames(my_simulation)
 }
+
 }
 \seealso{
 \code{\link{PhyloSim}}

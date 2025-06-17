@@ -17,11 +17,11 @@ getSpecTime(runs, thinning_factor = NULL, ymax = NULL, plot = TRUE)
 \arguments{
 \item{runs}{A \code{PhyloSim} or \code{PhylosimList} object}
 
-\item{thinning_factor}{Optional integer to reduce the number of time points (for plotting)}
+\item{thinning_factor}{Optional integer to reduce the number of time points for plotting (smootes the line). Turned off by default.}
 
-\item{ymax}{Optional numeric; fixed y-axis max for plotting}
+\item{ymax}{Optional numeric; fixed y-axis max for plotting. Usefull for comparing different runs. Turned off by default.}
 
-\item{plot}{Logical; whether to generate plots}
+\item{plot}{Logical; whether to generate plots. Default is TRUE}
 }
 \value{
 A \code{data.frame} (for single object) or list of data.frames (for list input)
