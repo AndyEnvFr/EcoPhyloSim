@@ -150,10 +150,13 @@ double Individual::getSeedsTo(int rel_x, int rel_y, int dispersal_type, double t
 double Individual::getFitness(double temp, bool env, bool dd, int generation, double redQueenStrength, double redQueen, double nicheWidth, double densityNicheWidth) {
     double out = (DBL_MIN * 100.0); // TODO: Why this?
 
+    //changed by andy
     if (env) out += m_envStrength * exp(-0.5 * pow((temp - m_Mean) / m_nicheWidth, 2.0)) + 1 - m_envStrength; // environmental niche
     if (dd) out += m_compStrength * (1.0 - exp(-0.5 * pow(m_LocalDensity / m_densityNicheWidth, 2))) + 1 - m_compStrength; // density-dependent niche with mean = 0
         // LocalDensity: the lower, the more and closer related neighbors (0 ~ same traits). min = 0, max = 0.25 (1(dissimilar traits) / 4(densityCut = 1 -> 4 neighbors))
-        // +++out, if dissimilar traits; 0+out, if same traits. 
+        // +++out, if dissimilar traits; 0+out, if same traits.
+    if (env && dd) out = out * 0.5; // bounds out between [0,1] as both expressions (if(env)... and if(dd)...) are bounded to [0,1]
+    // caution: this changes do not consider interaction with redQueen mechanism. For my purpouse redQueen remains off !
              
     // Implementation of the redQueen Mechanism
     if ((redQueenStrength != 0) || (redQueen != 0)) {
