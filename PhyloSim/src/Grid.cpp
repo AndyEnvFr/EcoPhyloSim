@@ -76,7 +76,7 @@ Landscape::Landscape(int xsize, int ysize, int type, bool neutral, bool dd, bool
                      int DensityCutoff, unsigned int mortalityStrength,
                      double envStrength, double compStrength, int fission, double redQueen, double redQueenStrength,
                      int protracted,
-                     std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth) {
+                     std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth, double densityNicheWidth) {
 
     m_Cutoff = dispersalCutoff;
     m_Neutral = neutral;
@@ -100,6 +100,7 @@ Landscape::Landscape(int xsize, int ysize, int type, bool neutral, bool dd, bool
     m_redQueenStrength = redQueenStrength;
     m_protracted = protracted;
     m_nicheWidth = nicheWidth;
+    m_densityNicheWidth = densityNicheWidth;
 
     //	func.seedrand(1500);
 
@@ -125,6 +126,7 @@ Landscape::Landscape(int xsize, int ysize, int type, bool neutral, bool dd, bool
             this->m_Individuals[cols][rows].m_envStrength = m_envStrength;
             this->m_Individuals[cols][rows].m_compStrength = m_compStrength;
             this->m_Individuals[cols][rows].m_nicheWidth = m_nicheWidth;
+            this->m_Individuals[cols][rows].m_densityNicheWidth = m_densityNicheWidth;
 
             //this->individuals[cols][rows].Species->date_of_extinction = runs;
         }
@@ -237,10 +239,10 @@ GlobalEnvironment::GlobalEnvironment(int xsize, int ysize, int type, bool neutra
                                      bool repro, unsigned int runs, double specRate, int dispersalCutoff,
                                      int densityCutoff, unsigned int mortalityStrength, double envStrength,
                                      double compStrength, int fission, double redQueen, double redQueenStrength,
-                                     int protracted, std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth) :
+                                     int protracted, std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth, double densityNicheWidth) :
         Landscape(xsize, ysize, type, neutral, dd, env, mort, repro, runs, specRate, dispersalCutoff, densityCutoff,
                   mortalityStrength, envStrength, compStrength, fission, redQueen, redQueenStrength, protracted, airmat,
-                  soilmat, nicheWidth) {
+                  soilmat, nicheWidth, densityNicheWidth) {
 
 }
 
@@ -331,7 +333,7 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
                 for (int kernel_y = 0; kernel_y < m_Ydimensions; kernel_y++) {
                     weights[array_length] = m_Individuals[kernel_x][kernel_y].getFitness(
                             m_Environment[kernel_x * m_Ydimensions + kernel_y].first, m_Env, m_DD, generation,
-                            m_redQueenStrength, m_redQueen, m_nicheWidth);
+                            m_redQueenStrength, m_redQueen, m_nicheWidth, m_densityNicheWidth);
                     seedSum += weights[array_length];
                     array_length++;
                 }
@@ -368,7 +370,7 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
             if (m_mortality && event % m_mortalityStrength != 0) {
                 double weight = m_Individuals[x_coordinate][y_coordinate].getFitness(
                         m_Environment[x_coordinate * m_Ydimensions + y_coordinate].first, m_Env, m_DD, generation,
-                        m_redQueenStrength, m_redQueen, m_nicheWidth);
+                        m_redQueenStrength, m_redQueen, m_nicheWidth, m_densityNicheWidth);
                 // important!! the frequency in relation to the base mortality controls the intensity of the mechanisms
                 double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 1.0);
                 //std::cout<<weight<<"\n"; // DEBUG
@@ -580,10 +582,10 @@ LocalEnvironment::LocalEnvironment(int xsize, int ysize, int type, bool neutral,
                                    bool repro, unsigned int runs, double specRate, int dispersalCutoff,
                                    int densityCutoff, unsigned int mortalityStrength, double envStrength,
                                    double compStrength, int fission, double redQueen, double redQueenStrength,
-                                   int protracted, std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth) :
+                                   int protracted, std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth, double densityNicheWidth) :
         Landscape(xsize, ysize, type, neutral, dd, env, mort, repro, runs, specRate, dispersalCutoff, densityCutoff,
                   mortalityStrength, envStrength, compStrength, fission, redQueen, redQueenStrength, protracted, airmat,
-                  soilmat, nicheWidth) {
+                  soilmat, nicheWidth, densityNicheWidth) {
 
 }
 
@@ -632,7 +634,7 @@ void LocalEnvironment::reproduce(unsigned int generation) {
         if (m_mortality && event % m_mortalityStrength != 0) {
             double weight = m_Individuals[x_coordinate][y_coordinate].getFitness(
                     m_Environment[x_coordinate * m_Ydimensions + y_coordinate].first, m_Env, m_DD, generation,
-                    m_redQueenStrength, m_redQueen, m_nicheWidth);
+                    m_redQueenStrength, m_redQueen, m_nicheWidth, m_densityNicheWidth);
             double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 1.0);
             if (weight > chanceOfDeath) continue;
         }
@@ -669,7 +671,8 @@ void LocalEnvironment::reproduce(unsigned int generation) {
                                                                                              m_Env, m_DD, generation,
                                                                                              m_redQueenStrength,
                                                                                              m_redQueen,
-                                                                                             m_nicheWidth);
+                                                                                             m_nicheWidth,
+                                                                                             m_densityNicheWidth);
                     } else if (m_mortality) {
                         weights[array_length] = m_Individuals[kernel_x][kernel_y].dispersal(m_Dispersal_type,
                                                                                             m_Individuals[kernel_x][kernel_y].euclidian_distance(

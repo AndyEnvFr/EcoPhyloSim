@@ -48,6 +48,7 @@ public:
 //	int m_Weight;
 
     double m_nicheWidth;
+    double m_densityNicheWidth;
     double m_Mean;
     double m_CompetitionMarker;
     double m_NeutralMarker;
@@ -67,9 +68,9 @@ public:
     void evolveDuringSpeciation();
 
     double getSeedsTo(int rel_x, int rel_y, int dispersal_type, double temp, bool env, bool dd, int generation,
-                      double redQueenStrength, double redQueen, double nicheWidth);
+                      double redQueenStrength, double redQueen, double nicheWidth, double densityNicheWidth);
 
-    double getFitness(double temp, bool env, bool dd, int generation, double redQueenStrength, double redQueen, double nicheWidth);
+    double getFitness(double temp, bool env, bool dd, int generation, double redQueenStrength, double redQueen, double nicheWidth, double densityNicheWidth);
 
 
     double dispersal(int dispersal_type, double distance);  // 1 for kernel, 2 for nearest neighbor, 3 for global

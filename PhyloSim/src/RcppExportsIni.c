@@ -15,10 +15,10 @@ See also comments here https://github.com/florianhartig/BayesianTools/issues/31
 extern SEXP _PhyloSim_callModel(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP,
                                 SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP,
                                 SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP,
-                                SEXP, SEXP, SEXP);
+                                SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-        {"_PhyloSim_callModel", (DL_FUNC) & _PhyloSim_callModel, 24},
+        {"_PhyloSim_callModel", (DL_FUNC) & _PhyloSim_callModel, 25},
         {NULL,                  NULL,                            0}
 };
 

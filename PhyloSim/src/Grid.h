@@ -53,6 +53,7 @@ public:
 
     double cellsWithinDensityCutoff;
     double m_nicheWidth;
+    double m_densityNicheWidth;
     double m_envStrength;
     double m_compStrength;
     int m_fission;
@@ -75,7 +76,7 @@ public:
               bool dd, bool env, bool mort, bool repro, unsigned int simulationEnd, double specRate,
               int dispersalCutoff, int densityCutoff, unsigned int mortalityStrength, double envStrength,
               double compStrength, int fission, double redQueen, double redQueenStrength, int protracted,
-              std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth);
+              std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth, double densityNicheWidth);
 
     virtual ~Landscape();
 
@@ -111,7 +112,7 @@ public:
                       unsigned int runs, double specRate, int dispersalCutoff, int densityCutoff,
                       unsigned int mortalityStrength,
                       double envStrength, double compStrength, int fission, double redQueen, double redQueenStrength,
-                      int protracted, std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth);
+                      int protracted, std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth, double densityNicheWidth);
 
     virtual ~GlobalEnvironment();
 
@@ -126,7 +127,7 @@ public:
                      unsigned int runs, double specRate, int dispersalCutoff, int densityCutoff,
                      unsigned int mortalityStrength,
                      double envStrength, double compStrength, int fission, double redQueen, double redQueenStrength,
-                     int protracted, std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth);
+                     int protracted, std::vector<double> airmat, std::vector<double> soilmat, double nicheWidth, double densityNicheWidth);
 
     virtual ~LocalEnvironment();
 
