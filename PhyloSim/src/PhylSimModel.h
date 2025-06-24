@@ -28,7 +28,7 @@ public:
                  bool env, bool neutral, bool mort, int mortStrength, bool repro, int dispersalCutoff,
                  int densityCutoff, std::string saveLocation, double envStrength, double compStrength,
                  int fission, double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
-                 std::vector<double> soilmat);
+                 std::vector<double> soilmat, double nicheWidth);
 
     ~PhylSimModel();
 

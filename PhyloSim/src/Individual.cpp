@@ -124,12 +124,12 @@ double Individual::dispersal(int dispersal_type, double distance) {
 
 
 double Individual::getSeedsTo(int rel_x, int rel_y, int dispersal_type, double temp, bool env, bool dd, int generation,
-                              double redQueenStrength, double redQueen) {
+                              double redQueenStrength, double redQueen, double nicheWidth) {
     double dispersal_weight = 0.0;
     dispersal_weight = dispersal(dispersal_type, euclidian_distance(rel_x, rel_y)); // Kernel or NN
 
     if (env || dd) {
-        double fitness_weight = getFitness(temp, env, dd, generation, redQueenStrength, redQueen);
+        double fitness_weight = getFitness(temp, env, dd, generation, redQueenStrength, redQueen, nicheWidth);
         return (dispersal_weight * fitness_weight);
     } else {
         return (dispersal_weight);
@@ -141,9 +141,10 @@ double Individual::getSeedsTo(int rel_x, int rel_y, int dispersal_type, double t
 * @param temp environmental parameter
 * @param env environment acting
 * @param dd density acting
+* @param nicheWidth variance for the environmental fitness kernel
 * @return Fitness
 */
-double Individual::getFitness(double temp, bool env, bool dd, int generation, double redQueenStrength, double redQueen) {
+double Individual::getFitness(double temp, bool env, bool dd, int generation, double redQueenStrength, double redQueen, double nicheWidth) {
     double out = (DBL_MIN * 100.0); // TODO: Why this?
 
     if (env) out += m_envStrength * exp(-0.5 * pow((temp - m_Mean) / m_nicheWidth, 2.0)) + 1 - m_envStrength; // environmental niche

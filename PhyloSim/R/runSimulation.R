@@ -57,7 +57,10 @@ runSimulation <- function(par)
         par$environment = T
       }
     }
-    
+
+    if (!is.null(par$nicheWidth) && par$nicheWidth <= 0) {
+      stop("nicheWidth must be a positive number (used as variance in the environmental kernel)")
+    }    
     
     if(par$density == 0 & par$environment == 0)
     {
@@ -94,7 +97,8 @@ runSimulation <- function(par)
                       protracted = par$protracted, 
                       airmatR = par$airmat, 
                       soilmatR = par$soilmat,
-                      prunePhylogeny = par$prunePhylogeny)  
+                      prunePhylogeny = par$prunePhylogeny,
+                      nicheWidth = par$nicheWidth)  
     
     runtime <- as.numeric((proc.time() - ptm)[3])
     

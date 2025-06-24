@@ -67,9 +67,9 @@ public:
     void evolveDuringSpeciation();
 
     double getSeedsTo(int rel_x, int rel_y, int dispersal_type, double temp, bool env, bool dd, int generation,
-                      double redQueenStrength, double redQueen);
+                      double redQueenStrength, double redQueen, double nicheWidth);
 
-    double getFitness(double temp, bool env, bool dd, int generation, double redQueenStrength, double redQueen);
+    double getFitness(double temp, bool env, bool dd, int generation, double redQueenStrength, double redQueen, double nicheWidth);
 
 
     double dispersal(int dispersal_type, double distance);  // 1 for kernel, 2 for nearest neighbor, 3 for global

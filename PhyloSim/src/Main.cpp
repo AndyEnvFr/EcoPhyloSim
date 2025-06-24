@@ -72,6 +72,7 @@ int main() {
     int protracted = 0;
     std::vector<double> airmat(1);
     std::vector<double> soilmat(1);
+    double nicheWidth = 0.03659906; // initial value, when nicheWidth was fixed
     bool prunePhylogeny = 1;
 
     RandomGen ran;
@@ -87,7 +88,7 @@ int main() {
 
     PhylSimModel Model(x, y, dispersal, runs, specRate, dens, env, neutral, mort,
                        mortStrength, repro, dispersalCutoff, densityCutoff, saveLoc, envStrength, compStrength, fission,
-                       redQueen, redQueenStrength, protracted, airmat, soilmat);
+                       redQueen, redQueenStrength, protracted, airmat, soilmat, nicheWidth);
     Model.update(runs);
 
     if (prunePhylogeny) {
