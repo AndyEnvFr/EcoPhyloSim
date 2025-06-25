@@ -16,33 +16,38 @@
 
 class PhylSimModel {
 public:
-    int m_Dispersal;
-    int m_X_coordinate;
-    int m_Y_coordinate;
-    int timeStep;
-    // TODO FH I don't see a compelling reason to implement this as pointers, move to normal class fields?
-    GlobalEnvironment *m_Global;
-    LocalEnvironment *m_Local;
+  int m_Dispersal;
+  int m_X_coordinate;
+  int m_Y_coordinate;
+  int timeStep;
+  // TODO FH I don't see a compelling reason to implement this as
+  // pointers, move to normal class fields?
+  GlobalEnvironment *m_Global;
+  LocalEnvironment *m_Local;
 
-    PhylSimModel(int x, int y, int dispersal, int simulationEnd, double specRate, bool dens,
-                 bool env, bool neutral, bool mort, int mortStrength, bool repro, int dispersalCutoff,
-                 int densityCutoff, std::string saveLocation, double envStrength, double compStrength,
-                 int fission, double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
-                 std::vector<double> soilmat, double nicheWidth, double densityNicheWidth);
+  PhylSimModel(int x, int y, int dispersal, int simulationEnd,
+               double specRate, bool dens, bool env, bool neutral,
+               bool mort, int mortStrength, bool repro,
+               int dispersalCutoff, int densityCutoff,
+               std::string saveLocation, double envStrength,
+               double compStrength, int fission, double redQueen,
+               double redQueenStrength, int protracted,
+               std::vector<double> airmat, std::vector<double> soilmat,
+               double nicheWidth, double densityNicheWidth,
+               double pDDNicheWidth, double pDDStrength,
+               bool positiveDens);
 
-    ~PhylSimModel();
+  ~PhylSimModel();
 
-    void get_data();
+  void get_data();
 
-    void getclimate();
+  void getclimate();
 
-    void update(unsigned int runs);
+  void update(unsigned int runs);
 
-    void gettraits();
-
+  void gettraits();
 
 private:
 };
-
 
 #endif /* PHYLSIMMODEL_H_ */

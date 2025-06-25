@@ -7,7 +7,8 @@
 callModel(x, y, dispersal, runs, specRate, dens, env, neutral, mort,
   mortStrength, repro, dispersalCutoff, densityCutoff, seed, envStrength,
   compStrength, fission, redQueen, redQueenStrength, protracted, airmatR,
-  soilmatR, prunePhylogeny, nicheWidth, densityNicheWidth)
+  soilmatR, prunePhylogeny, nicheWidth, densityNicheWidth, pDDNicheWidth,
+  pDDStrength, positiveDens)
 }
 \description{
 Core phylosim model

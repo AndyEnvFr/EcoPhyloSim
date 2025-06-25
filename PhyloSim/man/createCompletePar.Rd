@@ -5,8 +5,9 @@
 \title{Parameter Generator}
 \usage{
 createCompletePar(x = 50, y = 50, dispersal = "global", runs = 100,
-  specRate = 1, density = 0, densityNicheWidth = 0.1, environment = 0,
-  nicheWidth = 0.03659906, fitnessActsOn = "mortality",
+  specRate = 1, density = 0, densityNicheWidth = 0.1,
+  positiveDensity = 0, positiveDensityDependenceNicheWidth = 0.1,
+  environment = 0, nicheWidth = 0.03659906, fitnessActsOn = "mortality",
   fitnessBaseMortalityRatio = 10, densityCut = 1, seed = NULL,
   type = "base", fission = 0, redQueen = 0, redQueenStrength = 0,
   protracted = 0, airmat = 1, scenario = NULL,
@@ -27,6 +28,10 @@ createCompletePar(x = 50, y = 50, dispersal = "global", runs = 100,
 \item{density}{Float, determining whether or how strong the density dependence influences the model. By default (density=0) there is no density dependence. The higher the value of the parameter, the stronger is the density dependence.}
 
 \item{densityNicheWidth}{Double, width (σ) of the Gaussian density dependence fitness kernel. Smaller values imply stronger density filtering for individuals with similar traits. Default: 0.1.}
+
+\item{positiveDensity}{Float, determining whether or how strong the positive density dependence influences the model. By default (positiveDensity=0) there is no positive density dependence. The higher the value of the parameter, the stronger is the positive density dependence.}
+
+\item{positiveDensityDependenceNicheWidth}{Double, width (σ) of the Gaussian density dependence fitness kernel. Smaller values imply stronger density filtering for individuals with similar traits. Default: 0.1.}
 
 \item{environment}{Float, determining whether or how strong the environment influences the model.  By default (environment=0) there is no influence of the environment. The higher the value of the parameter, the stronger is the influence of the environment. Environment value must be between 0 and 1.}
 

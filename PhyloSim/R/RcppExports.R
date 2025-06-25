@@ -3,7 +3,7 @@
 
 #' Core phylosim model
 #' @export
-callModel <- function(x, y, dispersal, runs, specRate, dens, env, neutral, mort, mortStrength, repro, dispersalCutoff, densityCutoff, seed, envStrength, compStrength, fission, redQueen, redQueenStrength, protracted, airmatR, soilmatR, prunePhylogeny, nicheWidth, densityNicheWidth) {
-    .Call(`_PhyloSim_callModel`, x, y, dispersal, runs, specRate, dens, env, neutral, mort, mortStrength, repro, dispersalCutoff, densityCutoff, seed, envStrength, compStrength, fission, redQueen, redQueenStrength, protracted, airmatR, soilmatR, prunePhylogeny, nicheWidth, densityNicheWidth)
+callModel <- function(x, y, dispersal, runs, specRate, dens, env, neutral, mort, mortStrength, repro, dispersalCutoff, densityCutoff, seed, envStrength, compStrength, fission, redQueen, redQueenStrength, protracted, airmatR, soilmatR, prunePhylogeny, nicheWidth, densityNicheWidth, pDDNicheWidth, pDDStrength, positiveDens) {
+    .Call(`_PhyloSim_callModel`, x, y, dispersal, runs, specRate, dens, env, neutral, mort, mortStrength, repro, dispersalCutoff, densityCutoff, seed, envStrength, compStrength, fission, redQueen, redQueenStrength, protracted, airmatR, soilmatR, prunePhylogeny, nicheWidth, densityNicheWidth, pDDNicheWidth, pDDStrength, positiveDens)
 }
 

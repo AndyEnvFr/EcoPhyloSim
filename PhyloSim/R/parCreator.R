@@ -6,9 +6,11 @@
 #' @param runs  Integer or vector of Integers, Number of generations or sequence of generations the model runs over (see Details). 
 #' @param specRate Integer, Number of Individuals introduced to the community in each generation
 #' @param density Float, determining whether or how strong the density dependence influences the model. By default (density=0) there is no density dependence. The higher the value of the parameter, the stronger is the density dependence.
+#' @param densityNicheWidth Double, width (σ) of the Gaussian density dependence fitness kernel. Smaller values imply stronger density filtering for individuals with similar traits. Default: 0.1.
+#' @param positiveDensity Float, determining whether or how strong the positive density dependence influences the model. By default (positiveDensity=0) there is no positive density dependence. The higher the value of the parameter, the stronger is the positive density dependence.
+#' @param positiveDensityDependenceNicheWidth Double, width (σ) of the Gaussian density dependence fitness kernel. Smaller values imply stronger density filtering for individuals with similar traits. Default: 0.1.
 #' @param environment Float, determining whether or how strong the environment influences the model.  By default (environment=0) there is no influence of the environment. The higher the value of the parameter, the stronger is the influence of the environment. Environment value must be between 0 and 1.
 #' @param nicheWidth Double, Width (σ) of the Gaussian environmental fitness kernel. Smaller values imply stronger environmental filtering (i.e., only individuals with traits close to the environmental optimum have high fitness). Default: 0.03659906.
-#' @param densityNicheWidth Double, width (σ) of the Gaussian density dependence fitness kernel. Smaller values imply stronger density filtering for individuals with similar traits. Default: 0.1.
 #' @param fitnessActsOn Character, determining how the fitness influences the individuals. Possible inputs are "mortality" (default), "reproduction" or "both"
 #' @param fitnessBaseMortalityRatio Integer, determines the fitness based mortality ratio. Must be greater than or equal to 1.
 #' @param densityCut Integer, defines the effective range of the competition (ignored if density = FALSE)
@@ -28,7 +30,7 @@
 #' @example /inst/examples/parCreator-help.R
 #' @export
 
-createCompletePar <- function(x = 50, y = 50, dispersal = "global", runs = 100, specRate = 1.0, density = 0, densityNicheWidth = 0.1, environment = 0, nicheWidth = 0.03659906, fitnessActsOn = "mortality" , fitnessBaseMortalityRatio = 10, densityCut = 1, seed=NULL,  type = "base", fission = 0, redQueen = 0, redQueenStrength = 0, protracted = 0, airmat = 1, scenario = NULL, calculateSummaries = FALSE, convertToBinaryTree = TRUE, prunePhylogeny = TRUE){
+createCompletePar <- function(x = 50, y = 50, dispersal = "global", runs = 100, specRate = 1.0, density = 0, densityNicheWidth = 0.1, positiveDensity = 0, positiveDensityDependenceNicheWidth = 0.1, environment = 0, nicheWidth = 0.03659906, fitnessActsOn = "mortality" , fitnessBaseMortalityRatio = 10, densityCut = 1, seed=NULL,  type = "base", fission = 0, redQueen = 0, redQueenStrength = 0, protracted = 0, airmat = 1, scenario = NULL, calculateSummaries = FALSE, convertToBinaryTree = TRUE, prunePhylogeny = TRUE){
     
   soilmat <- 1 # Needs to be defined here as long as it is not
                # implemented in the model
@@ -58,7 +60,9 @@ createCompletePar <- function(x = 50, y = 50, dispersal = "global", runs = 100, 
   if (is.null(seed)) seed = sample(1:10000,1)
   
   par = list(x=x,y=y,dispersal = dispersal, runs = runs, specRate = specRate, 
-             density = density, densityNicheWidth = densityNicheWidth, environment = environment, nicheWidth = nicheWidth, fitnessActsOn=fitnessActsOn,
+             density = density, densityNicheWidth = densityNicheWidth, positiveDensity = positiveDensity,
+             positiveDensityDependenceNicheWidth = positiveDensityDependenceNicheWidth, 
+             environment = environment, nicheWidth = nicheWidth, fitnessActsOn=fitnessActsOn,
              fitnessBaseMortalityRatio=fitnessBaseMortalityRatio, densityCut = densityCut, 
              seed = seed, type = type, scenario = scenario, fission = fission, 
              redQueen = redQueen, redQueenStrength = redQueenStrength, protracted = protracted,

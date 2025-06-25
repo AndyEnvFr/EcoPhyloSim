@@ -47,6 +47,17 @@ runSimulation <- function(par)
       }
     }
     
+    
+    if (is.numeric(par$positiveDensity)) {
+      if (par$positiveDensity == 0) {
+        par$positiveDensity = F
+        par$pDDStrength = 1
+      } else{
+        par$pDDStrength = par$positiveDensity
+        par$positiveDensity = T
+      }
+    }
+    
     if (is.numeric(par$environment)) {
       if (par$environment > 1 || par$environment < 0) stop("Parameter environment must be between 0 and 1")
       if (par$environment == 0) {
@@ -65,8 +76,12 @@ runSimulation <- function(par)
     if (!is.null(par$densityNicheWidth) && par$densityNicheWidth <= 0) {
       stop("densityNicheWidth must be a positive number (used as standard deviation in the density kernel)")
     }    
+
+    if (!is.null(par$positiveDensityDependenceNicheWidth) && par$positiveDensityDependenceNicheWidth <= 0) {
+      stop("positiveDensityDependenceNicheWidth must be a positive number (used as standard deviation in the positive density dependence kernel)")
+    }    
     
-    if(par$density == 0 & par$environment == 0)
+    if(par$density == 0 & par$environment == 0 & par$positiveDensity == 0)
     {
       neutral = TRUE
     }else{
@@ -85,6 +100,7 @@ runSimulation <- function(par)
                       runs = round(par$runs), 
                       specRate = par$specRate, 
                       dens = par$density, 
+                      positiveDens = par$positiveDensity, 
                       env = par$environment, 
                       neutral = neutral, 
                       mort = mortalityFitness, 
@@ -95,6 +111,7 @@ runSimulation <- function(par)
                       seed = par$seed, 
                       envStrength = par$envStrength, 
                       compStrength = par$compStrength, 
+                      pDDStrength = par$pDDStrength, 
                       fission = par$fission, 
                       redQueen = par$redQueen, 
                       redQueenStrength = par$redQueenStrength, 
@@ -103,7 +120,8 @@ runSimulation <- function(par)
                       soilmatR = par$soilmat,
                       prunePhylogeny = par$prunePhylogeny,
                       nicheWidth = par$nicheWidth,
-                      densityNicheWidth = par$densityNicheWidth
+                      densityNicheWidth = par$densityNicheWidth,
+                      pDDNicheWidth = par$positiveDensityDependenceNicheWidth
                       )  
     
     runtime <- as.numeric((proc.time() - ptm)[3])
