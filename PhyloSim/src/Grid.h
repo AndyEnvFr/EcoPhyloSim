@@ -4,6 +4,13 @@
  *  Created on: 20.06.2014
  *      Author: Paul
  *              Betim Musa <musab@informatik.uni-freiburg.de>
+ *              Andrea Ingrosso
+ *
+ * renamed variables after implementation of positive density dependence [Andy]
+ * [m_]compStrength -> [m_]nDDStrength
+ * [m_]nicheWidth -> [m_]envNicheWidth
+ * m_DD -> m_nDD
+ * dd -> ndd
  */
 
 #ifndef GRID_H_
@@ -39,7 +46,7 @@ public:
   // Indicates whether the species dispersion depends on local
   // conditions or not.
   bool m_Neutral;
-  bool m_DD;
+  bool m_nDD;
   bool m_pDD;
   bool m_Env;
   // switches to determine wheather fitness should affect mortality or
@@ -58,11 +65,11 @@ public:
   double m_Speciation_Rate;
 
   double cellsWithinDensityCutoff;
-  double m_nicheWidth;
-  double m_densityNicheWidth;
+  double m_envNicheWidth;
+  double m_nDDNicheWidth;
   double m_pDDNicheWidth;
   double m_envStrength;
-  double m_compStrength;
+  double m_nDDStrength;
   double m_pDDStrength;
   int m_fission;
   double m_redQueen;
@@ -79,15 +86,11 @@ public:
 
   Landscape();
 
-  Landscape(int xsize, int ysize, int type, bool neutral, bool dd,
-            bool env, bool mort, bool repro, unsigned int simulationEnd,
-            double specRate, int dispersalCutoff, int densityCutoff,
-            unsigned int mortalityStrength, double envStrength,
-            double compStrength, int fission, double redQueen,
-            double redQueenStrength, int protracted,
-            std::vector<double> airmat, std::vector<double> soilmat,
-            double nicheWidth, double densityNicheWidth,
-            double pDDNicheWidth, double pDDStrength, bool pdd);
+  Landscape(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool env, bool mort, bool repro,
+            unsigned int simulationEnd, double specRate, int dispersalCutoff, int densityCutoff,
+            unsigned int mortalityStrength, double envStrength, double nDDStrength, double pDDStrength, int fission,
+            double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
+            std::vector<double> soilmat, double envNicheWidth, double nDDNicheWidth, double pDDNicheWidth);
 
   virtual ~Landscape();
 
@@ -118,17 +121,11 @@ class GlobalEnvironment : public Landscape {
 public:
   GlobalEnvironment();
 
-  GlobalEnvironment(int xsize, int ysize, int type, bool neutral,
-                    bool dd, bool env, bool mort, bool repro,
-                    unsigned int runs, double specRate,
-                    int dispersalCutoff, int densityCutoff,
-                    unsigned int mortalityStrength, double envStrength,
-                    double compStrength, int fission, double redQueen,
-                    double redQueenStrength, int protracted,
-                    std::vector<double> airmat,
-                    std::vector<double> soilmat, double nicheWidth,
-                    double densityNicheWidth, double pDDNicheWidth,
-                    double pDDStrength, bool pdd);
+  GlobalEnvironment(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool env, bool mort, bool repro,
+                    unsigned int runs, double specRate, int dispersalCutoff, int densityCutoff,
+                    unsigned int mortalityStrength, double envStrength, double nDDStrength, double pDDStrength,
+                    int fission, double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
+                    std::vector<double> soilmat, double envNicheWidth, double nDDNicheWidth, double pDDNicheWidth);
 
   virtual ~GlobalEnvironment();
 
@@ -139,17 +136,11 @@ class LocalEnvironment : public Landscape {
 public:
   LocalEnvironment();
 
-  LocalEnvironment(int xsize, int ysize, int type, bool neutral,
-                   bool dd, bool env, bool mort, bool repro,
-                   unsigned int runs, double specRate,
-                   int dispersalCutoff, int densityCutoff,
-                   unsigned int mortalityStrength, double envStrength,
-                   double compStrength, int fission, double redQueen,
-                   double redQueenStrength, int protracted,
-                   std::vector<double> airmat,
-                   std::vector<double> soilmat, double nicheWidth,
-                   double densityNicheWidth, double pDDNicheWidth,
-                   double pDDStrength, bool pdd);
+  LocalEnvironment(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool env, bool mort, bool repro,
+                   unsigned int runs, double specRate, int dispersalCutoff, int densityCutoff,
+                   unsigned int mortalityStrength, double envStrength, double nDDStrength, double pDDStrength,
+                   int fission, double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
+                   std::vector<double> soilmat, double envNicheWidth, double nDDNicheWidth, double pDDNicheWidth);
 
   virtual ~LocalEnvironment();
 

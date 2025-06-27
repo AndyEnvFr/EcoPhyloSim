@@ -54,7 +54,7 @@ int main() {
   int dispersal = 1;
   int runs = 100;
   double specRate = 1;
-  bool dens = false;         // 0
+  bool negativeDens = false; // 0
   bool positiveDens = false; // 0
   bool env = false;          // 0
   bool neutral = true;       // 1
@@ -66,16 +66,15 @@ int main() {
   int seed = 975;
   double envStrength = 1;
   double pDDStrength = 1;
-  double compStrength = 1;
+  double nDDStrength = 1;
   int fission = 0;
   double redQueen = 0;
   double redQueenStrength = 0;
   int protracted = 0;
   std::vector<double> airmat(1);
   std::vector<double> soilmat(1);
-  double nicheWidth =
-      0.03659906; // initial value, when nicheWidth was fixed
-  double densityNicheWidth = 0.1;
+  double envNicheWidth = 0.03659906; // initial value, when nicheWidth was fixed
+  double nDDNicheWidth = 0.1;
   double pDDNicheWidth = 0.1;
   bool prunePhylogeny = 1;
 
@@ -83,36 +82,29 @@ int main() {
   ran.seedrand(seed); // seed is int while seedrand expects unsigned int
 
   // avoid inconsistent input
-  if (neutral && dens)
-    throw std::runtime_error(
-        "A neutral model can't be density dependent!");
+  if (neutral && negativeDens)
+    throw std::runtime_error("A neutral model can't be density dependent!");
   if (neutral && positiveDens)
-    throw std::runtime_error(
-        "A neutral model can't be (positive) density dependent!");
+    throw std::runtime_error("A neutral model can't be (positive) density dependent!");
   if (neutral && env)
-    throw std::runtime_error(
-        "A neutral model can't be depending on the environment!");
+    throw std::runtime_error("A neutral model can't be depending on the environment!");
 
   std::string saveLoc = "C:/Users/Tankr_000/Documents/";
 
   // Running the model
 
-  PhylSimModel Model(
-      x, y, dispersal, runs, specRate, dens, env, neutral, mort,
-      mortStrength, repro, dispersalCutoff, densityCutoff, saveLoc,
-      envStrength, compStrength, fission, redQueen, redQueenStrength,
-      protracted, airmat, soilmat, nicheWidth, densityNicheWidth,
-      pDDNicheWidth, pDDStrength, positiveDens);
+  PhylSimModel Model(x, y, dispersal, runs, specRate, negativeDens, positiveDens, env, neutral, mort,
+                     mortStrength, repro, dispersalCutoff, densityCutoff, saveLoc, nDDStrength, pDDStrength,
+                     envStrength, fission, redQueen, redQueenStrength, protracted, airmat, soilmat, nDDNicheWidth,
+                     pDDNicheWidth, envNicheWidth);
   Model.update(runs);
 
   if (prunePhylogeny) {
     Model.m_Global->m_Phylogeny.prunePhylogeny(runs);
-    Model.m_Global->m_Phylogeny.writePhylogenyR(
-        1, Model.m_Global->m_Phylogeny.m_PrunedPhylo);
+    Model.m_Global->m_Phylogeny.writePhylogenyR(1, Model.m_Global->m_Phylogeny.m_PrunedPhylo);
   }
 
-  Model.m_Global->m_Phylogeny.writePhylogenyR(
-      1, Model.m_Global->m_Phylogeny.m_FullPhylogeny);
+  Model.m_Global->m_Phylogeny.writePhylogenyR(1, Model.m_Global->m_Phylogeny.m_FullPhylogeny);
 
   //	Model.get_data();
   //	Model.getclimate();

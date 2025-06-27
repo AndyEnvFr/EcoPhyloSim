@@ -3,6 +3,11 @@
  *
  *  Created on: 20.06.2014
  *      Author: Paul
+ *
+ * renamed variables after implementation of positive density dependence [Andy]
+ * [m_]compStrength -> [m_]nDDStrength
+ * [m_]nicheWidth -> [m_]envNicheWidth
+ * dens -> negativeDens
  */
 
 #ifndef PHYLSIMMODEL_H_
@@ -25,17 +30,11 @@ public:
   GlobalEnvironment *m_Global;
   LocalEnvironment *m_Local;
 
-  PhylSimModel(int x, int y, int dispersal, int simulationEnd,
-               double specRate, bool dens, bool env, bool neutral,
-               bool mort, int mortStrength, bool repro,
-               int dispersalCutoff, int densityCutoff,
-               std::string saveLocation, double envStrength,
-               double compStrength, int fission, double redQueen,
-               double redQueenStrength, int protracted,
-               std::vector<double> airmat, std::vector<double> soilmat,
-               double nicheWidth, double densityNicheWidth,
-               double pDDNicheWidth, double pDDStrength,
-               bool positiveDens);
+  PhylSimModel(int x, int y, int dispersal, int simulationEnd, double specRate, bool negativeDens, bool positiveDens,
+               bool env, bool neutral, bool mort, int mortStrength, bool repro, int dispersalCutoff, int densityCutoff,
+               std::string saveLocation, double nDDStrength, double pDDStrength, double envStrength, int fission,
+               double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
+               std::vector<double> soilmat, double nDDNicheWidth, double pDDNicheWidth, double envNicheWidth);
 
   ~PhylSimModel();
 

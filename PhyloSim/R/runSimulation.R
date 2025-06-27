@@ -9,6 +9,13 @@
 #' @export
 #' @example /inst/examples/runSimulation-help.R
 
+
+# changed variables names, when implemented positive density dependence [Andy]
+# dens -> negativeDens
+# density -> negativeDensity
+# compStrength -> nDDStrength
+# nicheWidth -> envNicheWidth
+
 runSimulation <- function(par)
 {
   
@@ -37,13 +44,13 @@ runSimulation <- function(par)
     }else stop("wrong fitness parameters")
     
     
-    if (is.numeric(par$density)) {
-      if (par$density == 0) {
-        par$density = F
-        par$compStrength = 1
+    if (is.numeric(par$negativeDensity)) {
+      if (par$negativeDensity == 0) {
+        par$negativeDensity = F
+        par$nDDStrength = 1
       } else{
-        par$compStrength = par$density
-        par$density = T
+        par$nDDStrength = par$negativeDensity
+        par$negativeDensity = T
       }
     }
     
@@ -69,19 +76,23 @@ runSimulation <- function(par)
       }
     }
 
-    if (!is.null(par$nicheWidth) && par$nicheWidth <= 0) {
-      stop("nicheWidth must be a positive number (used as standard deviation in the environmental kernel)")
+    if (!is.null(par$envNicheWidth) && par$envNicheWidth <= 0) {
+      stop("envNicheWidth must be a positive number (used as standard deviation in the environmental kernel)")
     }    
 
-    if (!is.null(par$densityNicheWidth) && par$densityNicheWidth <= 0) {
-      stop("densityNicheWidth must be a positive number (used as standard deviation in the density kernel)")
+    if (!is.null(par$nDDNicheWidth) && par$nDDNicheWidth <= 0) {
+      stop("nDDNicheWidth must be a positive number (used as standard deviation in the density kernel)")
     }    
 
-    if (!is.null(par$positiveDensityDependenceNicheWidth) && par$positiveDensityDependenceNicheWidth <= 0) {
-      stop("positiveDensityDependenceNicheWidth must be a positive number (used as standard deviation in the positive density dependence kernel)")
+    if (!is.null(par$pDDNicheWidth) && par$pDDNicheWidth <= 0) {
+      stop("pDDNicheWidth must be a positive number (used as standard deviation in the positive density dependence kernel)")
+    }    
+
+    if (!is.null(par$nDDStrength) && par$nDDStrength <= 0) {
+      stop("nDDStrength must be a positive number (used as standard deviation in the positive density dependence kernel)")
     }    
     
-    if(par$density == 0 & par$environment == 0 & par$positiveDensity == 0)
+    if(par$negativeDensity == 0 && par$environment == 0 && par$positiveDensity == 0)
     {
       neutral = TRUE
     }else{
@@ -99,8 +110,8 @@ runSimulation <- function(par)
                       dispersal = dispersal, 
                       runs = round(par$runs), 
                       specRate = par$specRate, 
-                      dens = par$density, 
-                      positiveDens = par$positiveDensity, 
+                      negativeDens = par$negativeDensity,
+                      positiveDens = par$positiveDensity,
                       env = par$environment, 
                       neutral = neutral, 
                       mort = mortalityFitness, 
@@ -110,7 +121,7 @@ runSimulation <- function(par)
                       densityCutoff = par$densityCut, 
                       seed = par$seed, 
                       envStrength = par$envStrength, 
-                      compStrength = par$compStrength, 
+                      nDDStrength = par$nDDStrength, 
                       pDDStrength = par$pDDStrength, 
                       fission = par$fission, 
                       redQueen = par$redQueen, 
@@ -119,10 +130,9 @@ runSimulation <- function(par)
                       airmatR = par$airmat, 
                       soilmatR = par$soilmat,
                       prunePhylogeny = par$prunePhylogeny,
-                      nicheWidth = par$nicheWidth,
-                      densityNicheWidth = par$densityNicheWidth,
-                      pDDNicheWidth = par$positiveDensityDependenceNicheWidth
-                      )  
+                      envNicheWidth = par$envNicheWidth,
+                      nDDNicheWidth = par$nDDNicheWidth,
+                      pDDNicheWidth = par$pDDNicheWidth)  
     
     runtime <- as.numeric((proc.time() - ptm)[3])
     
@@ -183,7 +193,7 @@ runSimulation <- function(par)
   }else if(par$type == "Leipzig"){
     
     # TODO ... NOT FUNCTIONAL YET !!!
-    out <- .C(callLeipzig, as.integer(x),as.integer(y), as.integer(dispersal), as.integer(nSpec),as.integer(specRate), as.integer(runs), as.logical(density), as.numeric(densityStrength), specOut = as.integer(outVec), densOut = as.numeric(outVec))[9:10]
+    out <- .C(callLeipzig, as.integer(x),as.integer(y), as.integer(dispersal), as.integer(nSpec),as.integer(specRate), as.integer(runs), as.logical(negativeDensity), as.numeric(densityStrength), specOut = as.integer(outVec), densOut = as.numeric(outVec))[9:10]
     
     specMat = matrix(out[[1]],ncol=x, nrow=y)
     densMat = matrix(out[[2]],ncol=x, nrow=y)
@@ -238,7 +248,7 @@ runSimulation <- function(par)
 #   mortalityFitness = T    
 # }else stop("wrong fitness parameters")
 # 
-# if(density == FALSE & environment == FALSE)
+# if(density == FALSE && environment == FALSE)
 # {
 #   neutral = TRUE
 # }else{

@@ -5,9 +5,9 @@
 \title{Parameter Generator}
 \usage{
 createCompletePar(x = 50, y = 50, dispersal = "global", runs = 100,
-  specRate = 1, density = 0, densityNicheWidth = 0.1,
-  positiveDensity = 0, positiveDensityDependenceNicheWidth = 0.1,
-  environment = 0, nicheWidth = 0.03659906, fitnessActsOn = "mortality",
+  specRate = 1, negativeDensity = 0, nDDNicheWidth = 0.1,
+  positiveDensity = 0, pDDNicheWidth = 0.1, environment = 0,
+  envNicheWidth = 0.03659906, fitnessActsOn = "mortality",
   fitnessBaseMortalityRatio = 10, densityCut = 1, seed = NULL,
   type = "base", fission = 0, redQueen = 0, redQueenStrength = 0,
   protracted = 0, airmat = 1, scenario = NULL,
@@ -25,17 +25,9 @@ createCompletePar(x = 50, y = 50, dispersal = "global", runs = 100,
 
 \item{specRate}{Integer, Number of Individuals introduced to the community in each generation}
 
-\item{density}{Float, determining whether or how strong the density dependence influences the model. By default (density=0) there is no density dependence. The higher the value of the parameter, the stronger is the density dependence.}
+\item{negativeDensity, positiveDensity, environment}{Float, defines the strength of the respective ecological process. By default all are 0 (no effect). Higher values increase process strength. See Details for process-specific information.}
 
-\item{densityNicheWidth}{Double, width (σ) of the Gaussian density dependence fitness kernel. Smaller values imply stronger density filtering for individuals with similar traits. Default: 0.1.}
-
-\item{positiveDensity}{Float, determining whether or how strong the positive density dependence influences the model. By default (positiveDensity=0) there is no positive density dependence. The higher the value of the parameter, the stronger is the positive density dependence.}
-
-\item{positiveDensityDependenceNicheWidth}{Double, width (σ) of the Gaussian density dependence fitness kernel. Smaller values imply stronger density filtering for individuals with similar traits. Default: 0.1.}
-
-\item{environment}{Float, determining whether or how strong the environment influences the model.  By default (environment=0) there is no influence of the environment. The higher the value of the parameter, the stronger is the influence of the environment. Environment value must be between 0 and 1.}
-
-\item{nicheWidth}{Double, Width (σ) of the Gaussian environmental fitness kernel. Smaller values imply stronger environmental filtering (i.e., only individuals with traits close to the environmental optimum have high fitness). Default: 0.03659906.}
+\item{nDDNicheWidth, pDDNicheWidth, envNicheWidth}{Double, width (σ) of the Gaussian fitness kernel for the respective ecological process. Smaller values imply stronger trait-specific filtering. See Details for defaults and process-specific effects.}
 
 \item{fitnessActsOn}{Character, determining how the fitness influences the individuals. Possible inputs are "mortality" (default), "reproduction" or "both"}
 
@@ -72,7 +64,16 @@ A List with parameters
 Function to create a list of parameters for biogeographical simulations with \code{\link{runSimulation}} or \code{\link{runSimulationBatch}}
 }
 \details{
-If runs is a sequence of generations, intermediate results are saved. E.g. when runs is c(500, 600, 700), the simulation runs 700 generations in total, and the intermediate results at generations 500 and 600 are saved additionally. The intermediate and end results are saved in the output of \code{runSimulation}. \cr\cr If type = "Rneutral" the model will run entirely in R. This model is to be seen only for test and teaching purpose. To be used in practice it is far too slow. Also the output is reduced. Only the species landscape and the parameter settings will be displayed in the output.
+If runs is a sequence of generations, intermediate results are saved. E.g. when runs is c(500, 600, 700), the simulation runs 700 generations in total, and the intermediate results at generations 500 and 600 are saved additionally. The intermediate and end results are saved in the output of \code{runSimulation}.
+
+The model incorporates three main ecological processes, each controlled by a strength parameter and a corresponding niche width parameter:
+\itemize{
+\item \strong{Negative Density Dependence (Competition):} Controlled by \code{negativeDensity} and \code{nDDNicheWidth}. Higher \code{negativeDensity} values increase competitive pressure, while smaller \code{nDDNicheWidth} values make competition more trait-specific.
+\item \strong{Positive Density Dependence (Facilitation):} Controlled by \code{positiveDensity} and \code{pDDNicheWidth}. Higher \code{positiveDensity} values increase facilitation effects, while smaller \code{pDDNicheWidth} values make facilitation more trait-specific.
+\item \strong{Environmental Selection:} Controlled by \code{environment} and \code{envNicheWidth}. Higher \code{environment} values increase environmental filtering strength, while smaller \code{envNicheWidth} values make environmental selection more restrictive around the optimal trait value.
+}
+
+If type = "Rneutral" the model will run entirely in R. This model is to be seen only for test and teaching purpose. To be used in practice it is far too slow. Also the output is reduced. Only the species landscape and the parameter settings will be displayed in the output.
 }
 \examples{
 ## Define a parameter set

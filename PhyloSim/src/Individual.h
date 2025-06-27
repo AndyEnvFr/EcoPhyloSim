@@ -4,6 +4,12 @@
  *  Created on: 20.06.2014
  *      Author: Paul
  *              Betim Musa <musab@informatik.uni-freiburg.de>
+ *
+ *
+ * renamed variables after implementation of positive density dependence [Andy]
+ * [m_]compStrength -> [m_]nDDStrength
+ * [m_]nicheWidth -> [m_]envNicheWidth
+ * dd -> ndd
  */
 
 #ifndef INDIVIDUAL_H_
@@ -49,8 +55,8 @@ public:
   //	double m_FitnessWeight;
   //	int m_Weight;
 
-  double m_nicheWidth;
-  double m_densityNicheWidth;
+  double m_envNicheWidth;
+  double m_nDDNicheWidth;
   double m_pDDNicheWidth;
   double m_Mean;
   double m_CompetitionMarker;
@@ -58,7 +64,7 @@ public:
   double m_dispersalDistance;
 
   double m_envStrength;
-  double m_compStrength;
+  double m_nDDStrength;
   double m_pDDStrength;
 
   RandomGen m_RandomGenerator;
@@ -72,13 +78,10 @@ public:
 
   void evolveDuringSpeciation();
 
-  double getSeedsTo(int rel_x, int rel_y, int dispersal_type,
-                    double temp, bool env, bool dd, bool pdd,
-                    int generation, double redQueenStrength,
-                    double redQueen);
+  double getSeedsTo(int rel_x, int rel_y, int dispersal_type, double temp, bool env, bool ndd, bool pdd, int generation,
+                    double redQueenStrength, double redQueen);
 
-  double getFitness(double temp, bool env, bool dd, bool pdd,
-                    int generation, double redQueenStrength,
+  double getFitness(double temp, bool env, bool ndd, bool pdd, int generation, double redQueenStrength,
                     double redQueen);
 
   double dispersal(int dispersal_type,
