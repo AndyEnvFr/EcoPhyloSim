@@ -31,9 +31,9 @@ public:
   LocalEnvironment *m_Local;
 
   PhylSimModel(int x, int y, int dispersal, int simulationEnd, double specRate, bool negativeDens, bool positiveDens,
-               bool env, bool neutral, bool mort, int mortStrength, bool repro, int dispersalCutoff, int densityCutoff,
-               std::string saveLocation, double nDDStrength, double pDDStrength, double envStrength, int fission,
-               double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
+               bool env, bool neutral, bool mort, int mortStrength, bool repro, int dispersalCutoff, int nDensCutoff,
+               int pDensCutoff, std::string saveLocation, double nDDStrength, double pDDStrength, double envStrength,
+               int fission, double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
                std::vector<double> soilmat, double nDDNicheWidth, double pDDNicheWidth, double envNicheWidth);
 
   ~PhylSimModel();

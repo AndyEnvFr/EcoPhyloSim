@@ -27,7 +27,7 @@ int main() {
   cells in y-direction
   //	srand(1500);
       double specrate = 1.0;
-      int densityCut = 2;
+      int nDensCutoff = 2;
       int dispersalCut = 2;
       int mortalityStrength = 10;
       std::string saveLoc = "C:/Users/Stefan/Documents/";
@@ -62,7 +62,8 @@ int main() {
   int mortStrength = 10;
   bool repro = false;
   int dispersalCutoff = 1;
-  int densityCutoff = 1;
+  int nDensCutoff = 1;
+  int pDensCutoff = 1;
   int seed = 975;
   double envStrength = 1;
   double pDDStrength = 1;
@@ -93,10 +94,10 @@ int main() {
 
   // Running the model
 
-  PhylSimModel Model(x, y, dispersal, runs, specRate, negativeDens, positiveDens, env, neutral, mort,
-                     mortStrength, repro, dispersalCutoff, densityCutoff, saveLoc, nDDStrength, pDDStrength,
-                     envStrength, fission, redQueen, redQueenStrength, protracted, airmat, soilmat, nDDNicheWidth,
-                     pDDNicheWidth, envNicheWidth);
+  PhylSimModel Model(x, y, dispersal, runs, specRate, negativeDens, positiveDens, env, neutral, mort, mortStrength,
+                     repro, dispersalCutoff, nDensCutoff, pDensCutoff, saveLoc, nDDStrength, pDDStrength, envStrength,
+                     fission, redQueen, redQueenStrength, protracted, airmat, soilmat, nDDNicheWidth, pDDNicheWidth,
+                     envNicheWidth);
   Model.update(runs);
 
   if (prunePhylogeny) {

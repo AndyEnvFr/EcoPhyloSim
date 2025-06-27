@@ -18,8 +18,8 @@
 
 PhylSimModel::PhylSimModel(int X, int Y, int dispersal, int simulationEnd, double specRate, bool negativeDens,
                            bool positiveDens, bool env, bool neutral, bool mort, int mortalityStrength, bool repro,
-                           int dispersalCutoff, int densityCutoff, std::string saveLocation, double nDDStrength,
-                           double pDDStrength, double envStrength, int fission, double redQueen,
+                           int dispersalCutoff, int nDensCutoff, int pDensCutoff, std::string saveLocation,
+                           double nDDStrength, double pDDStrength, double envStrength, int fission, double redQueen,
                            double redQueenStrength, int protracted, std::vector<double> airmat,
                            std::vector<double> soilmat, double nDDNicheWidth, double pDDNicheWidth,
                            double envNicheWidth) {
@@ -35,17 +35,17 @@ PhylSimModel::PhylSimModel(int X, int Y, int dispersal, int simulationEnd, doubl
 #endif
 
   if (dispersal == 1) {
-    m_Global = new GlobalEnvironment(X, Y, dispersal, neutral, negativeDens, positiveDens, env, mort, repro,
-                                     simulationEnd, specRate, dispersalCutoff, densityCutoff, mortalityStrength,
-                                     nDDStrength, pDDStrength, envStrength, fission, redQueen, redQueenStrength,
-                                     protracted, airmat, soilmat, nDDNicheWidth, pDDNicheWidth, envNicheWidth);
+    m_Global = new GlobalEnvironment(
+        X, Y, dispersal, neutral, negativeDens, positiveDens, env, mort, repro, simulationEnd, specRate,
+        dispersalCutoff, nDensCutoff, pDensCutoff, mortalityStrength, nDDStrength, pDDStrength, envStrength, fission,
+        redQueen, redQueenStrength, protracted, airmat, soilmat, nDDNicheWidth, pDDNicheWidth, envNicheWidth);
     m_Local = NULL;
   } else if (dispersal == 2 || dispersal == 3) {
     m_Global = NULL;
-    m_Local = new LocalEnvironment(X, Y, dispersal, neutral, negativeDens, positiveDens, env, mort, repro,
-                                   simulationEnd, specRate, dispersalCutoff, densityCutoff, mortalityStrength,
-                                   nDDStrength, pDDStrength, envStrength, fission, redQueen, redQueenStrength,
-                                   protracted, airmat, soilmat, nDDNicheWidth, pDDNicheWidth, envNicheWidth);
+    m_Local = new LocalEnvironment(
+        X, Y, dispersal, neutral, negativeDens, positiveDens, env, mort, repro, simulationEnd, specRate,
+        dispersalCutoff, nDensCutoff, pDensCutoff, mortalityStrength, nDDStrength, pDDStrength, envStrength, fission,
+        redQueen, redQueenStrength, protracted, airmat, soilmat, nDDNicheWidth, pDDNicheWidth, envNicheWidth);
   }
 
   timeStep = 0;

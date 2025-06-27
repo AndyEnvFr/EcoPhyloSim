@@ -47,7 +47,8 @@ public:
   int m_X_coordinate;
   int m_Y_coordinate;
 
-  double m_LocalDensity;
+  double m_nLocalDensity;
+  double m_pLocalDensity;
   unsigned long long m_Age;
   int m_incip_Age;
 

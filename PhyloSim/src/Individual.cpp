@@ -25,8 +25,10 @@ Individual::Individual() {
   this->m_X_coordinate = -999;
   this->m_Y_coordinate = -999;
 
-  this->m_LocalDensity = 0.0; // density experienced around itself, will
-                              // be updated automatically
+  this->m_nLocalDensity = 0.0; // density experienced around itself, will
+  // be updated automatically
+  this->m_pLocalDensity = 0.0;
+  
   this->m_Age = 0;
   this->m_incip_Age = -99999999;
 
@@ -63,7 +65,8 @@ Individual::Individual(const Individual &ind) {
   this->m_Species = ind.m_Species;
   this->m_X_coordinate = ind.m_X_coordinate;
   this->m_Y_coordinate = ind.m_Y_coordinate;
-  this->m_LocalDensity = ind.m_LocalDensity;
+  this->m_nLocalDensity = ind.m_nLocalDensity;
+  this->m_pLocalDensity = ind.m_pLocalDensity;
   this->m_Age = 0;
   this->m_incip_Age = -99999999;
   //	this -> m_FitnessWeight = ind.m_FitnessWeight;
@@ -93,7 +96,8 @@ void Individual::operator=(const Individual &ind) {
   this->m_Species = ind.m_Species;
   this->m_X_coordinate = -999;
   this->m_Y_coordinate = -999;
-  this->m_LocalDensity = ind.m_LocalDensity;
+  this->m_nLocalDensity = ind.m_nLocalDensity;
+  this->m_pLocalDensity = ind.m_pLocalDensity;
   this->m_Age = 0;
   this->m_incip_Age = -99999999;
 
@@ -170,16 +174,16 @@ double Individual::getFitness(double temp, bool env, bool ndd, bool pdd, int gen
     out += m_envStrength * exp(-0.5 * pow((temp - m_Mean) / m_envNicheWidth, 2.0)) + 1 -
            m_envStrength; // environmental niche
   if (ndd)
-    out += m_nDDStrength * (1.0 - exp(-0.5 * pow(m_LocalDensity / m_nDDNicheWidth, 2))) + 1 -
+    out += m_nDDStrength * (1.0 - exp(-0.5 * pow(m_nLocalDensity / m_nDDNicheWidth, 2))) + 1 -
            m_nDDStrength; // density-dependent niche with mean = 0
-  // LocalDensity: the lower, the more and closer related neighbors (0 ~
+  // nLocalDensity: the lower, the more and closer related neighbors (0 ~
   // same traits). min = 0, max = 0.25 (1(dissimilar traits) /
   // 4(densityCut = 1 -> 4 neighbors))
   // +++out, if dissimilar traits; 0+out, if same traits.
   if (pdd)
-    out += m_pDDStrength * exp(-0.5 * pow(m_LocalDensity / m_pDDNicheWidth, 2)) + 1 -
+    out += m_pDDStrength * exp(-0.5 * pow(m_pLocalDensity / m_pDDNicheWidth, 2)) + 1 -
            m_pDDStrength; // positive density dependence
-  // LocalDensity: the lower, the more and closer related neighbors (0 ~
+  // pLocalDensity: the lower, the more and closer related neighbors (0 ~
   // same traits). min = 0, max = 0.25
   // +++out, if same traits; 0+out, if dissimilar traits.
 

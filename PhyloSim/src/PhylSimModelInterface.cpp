@@ -2,7 +2,7 @@
  * Author: Betim Musa
  * This is the main interface between the phylogeny simulation (written
  * in C++) and R.
- * 
+ *
  * renamed variables for positive density dependen implementation:
  * compStrength -> nDDStrength
  * NicheWidth -> envNicheWidth
@@ -31,9 +31,9 @@ using namespace Rcpp;
 //' @export
 // [[Rcpp::export]]
 List callModel(int x, int y, int dispersal, IntegerVector runs, double specRate, bool negativeDens, bool positiveDens,
-               bool env, bool neutral, bool mort, int mortStrength, bool repro, int dispersalCutoff, int densityCutoff,
-               int seed, double envStrength, double nDDStrength, double pDDStrength, int fission, double redQueen,
-               double redQueenStrength, int protracted, NumericVector airmatR, NumericVector soilmatR,
+               bool env, bool neutral, bool mort, int mortStrength, bool repro, int dispersalCutoff, int nDensCutoff,
+               int pDensCutoff, int seed, double envStrength, double nDDStrength, double pDDStrength, int fission,
+               double redQueen, double redQueenStrength, int protracted, NumericVector airmatR, NumericVector soilmatR,
                bool prunePhylogeny, double envNicheWidth, double nDDNicheWidth, double pDDNicheWidth) {
 #ifdef DEBUG
   std::ofstream debugFile;
@@ -52,7 +52,8 @@ List callModel(int x, int y, int dispersal, IntegerVector runs, double specRate,
   debugFile << "int mortStrength = " << mortStrength << ";" << std::endl;
   debugFile << "bool repro = " << repro << ";" << std::endl;
   debugFile << "int dispersalCutoff = " << dispersalCutoff << ";" << std::endl;
-  debugFile << "int densityCutoff = " << densityCutoff << ";" << std::endl;
+  debugFile << "int negative densityCutoff = " << nDensCutoff << ";" << std::endl;
+  debugFile << "int positive densityCutoff = " << pDensCutoff << ";" << std::endl;
   debugFile << "int seed = " << seed << ";" << std::endl;
   debugFile << "double envStrength = " << envStrength << ";" << std::endl;
   debugFile << "double nDDStrength = " << nDDStrength << ";" << std::endl;
@@ -85,8 +86,8 @@ List callModel(int x, int y, int dispersal, IntegerVector runs, double specRate,
   Rcpp::List outList = Rcpp::List::create();
 
   PhylSimModel phylSimModel(x, y, dispersal, runs[nRuns - 1], specRate, negativeDens, positiveDens, env, neutral, mort,
-                            mortStrength, repro, dispersalCutoff, densityCutoff, tempSaveLoc, nDDStrength, pDDStrength,
-                            envStrength, fission, redQueen, redQueenStrength, protracted, airmat, soilmat,
+                            mortStrength, repro, dispersalCutoff, nDensCutoff, pDensCutoff, tempSaveLoc, nDDStrength,
+                            pDDStrength, envStrength, fission, redQueen, redQueenStrength, protracted, airmat, soilmat,
                             nDDNicheWidth, pDDNicheWidth, envNicheWidth);
 
   for (int step = 0; step < nRuns; step++) {

@@ -13,7 +13,7 @@
 #'                        specRate=function()return(runif(1, 1, 10)))
 #' fixedParams <- list(x=30, y=30,
 #'                     runs=1000,
-#'                     densityCut=1,
+#'                     nDensityCut=1,
 #'                     calculateSummaries=TRUE
 #' 
 #' runPhylosimAnalysis(variableParams,

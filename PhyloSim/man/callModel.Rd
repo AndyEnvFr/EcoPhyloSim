@@ -5,10 +5,10 @@
 \title{Core phylosim model}
 \usage{
 callModel(x, y, dispersal, runs, specRate, negativeDens, positiveDens, env,
-  neutral, mort, mortStrength, repro, dispersalCutoff, densityCutoff, seed,
-  envStrength, nDDStrength, pDDStrength, fission, redQueen, redQueenStrength,
-  protracted, airmatR, soilmatR, prunePhylogeny, envNicheWidth, nDDNicheWidth,
-  pDDNicheWidth)
+  neutral, mort, mortStrength, repro, dispersalCutoff, nDensCutoff,
+  pDensCutoff, seed, envStrength, nDDStrength, pDDStrength, fission, redQueen,
+  redQueenStrength, protracted, airmatR, soilmatR, prunePhylogeny,
+  envNicheWidth, nDDNicheWidth, pDDNicheWidth)
 }
 \description{
 Core phylosim model
