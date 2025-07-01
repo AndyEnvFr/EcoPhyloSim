@@ -28,9 +28,11 @@ public:
   int nDensCutoff;
   int pDensCutoff;
   double speciationRate;
-  double densityStrength;
+  double nDDStrength;
+  double pDDStrength;
   bool neutral;
-  bool densityDependence;
+  bool nDD;
+  bool pDD;
   bool environmentalDependence;
 
   // Evolution

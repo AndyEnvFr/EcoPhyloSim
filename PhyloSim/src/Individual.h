@@ -57,8 +57,6 @@ public:
   //	int m_Weight;
 
   double m_envNicheWidth;
-  double m_nDDNicheWidth;
-  double m_pDDNicheWidth;
   double m_Mean;
   double m_CompetitionMarker;
   double m_NeutralMarker;

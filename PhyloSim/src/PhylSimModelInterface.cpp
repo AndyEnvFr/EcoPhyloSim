@@ -57,6 +57,7 @@ List callModel(int x, int y, int dispersal, IntegerVector runs, double specRate,
   debugFile << "int seed = " << seed << ";" << std::endl;
   debugFile << "double envStrength = " << envStrength << ";" << std::endl;
   debugFile << "double nDDStrength = " << nDDStrength << ";" << std::endl;
+  debugFile << "double pDDStrength = " << pDDStrength << ";" << std::endl;
   debugFile << "int fission = " << fission << ";" << std::endl;
   debugFile << "double redQueen = " << redQueen << ";" << std::endl;
   debugFile << "double redQueenStrength = " << redQueenStrength << ";" << std::endl;

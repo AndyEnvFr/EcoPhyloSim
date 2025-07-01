@@ -201,10 +201,12 @@ void Parameters::createParameters() {
   intParameters.push_back(pair<string, int>(string("pDensCutoff"), 2));
   //
   doubleParameters.push_back(pair<string, double>(string("SpeciationRate"), 0.7));
-  doubleParameters.push_back(pair<string, double>(string("DensityStrength"), 0.9));
+  doubleParameters.push_back(pair<string, double>(string("nDDStrength"), 0.9));
+  doubleParameters.push_back(pair<string, double>(string("pDDStrength"), 0.9));
   //
   boolParameters.push_back(pair<string, bool>(string("NeutralEnvironment"), false));
-  boolParameters.push_back(pair<string, bool>(string("DensityDependence"), false));
+  boolParameters.push_back(pair<string, bool>(string("nDD"), false));
+  boolParameters.push_back(pair<string, bool>(string("pDD"), false));
   boolParameters.push_back(pair<string, bool>(string("EnvironmentalDependence"), true));
   //
   //

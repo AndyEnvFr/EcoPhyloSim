@@ -17,7 +17,7 @@
 #include "Species.h"
 
 PhylSimModel::PhylSimModel(int X, int Y, int dispersal, int simulationEnd, double specRate, bool negativeDens,
-                           bool positiveDens, bool env, bool neutral, bool mort, int mortalityStrength, bool repro,
+                           bool positiveDens, bool env, bool neutral, bool mort, int mortStrength, bool repro,
                            int dispersalCutoff, int nDensCutoff, int pDensCutoff, std::string saveLocation,
                            double nDDStrength, double pDDStrength, double envStrength, int fission, double redQueen,
                            double redQueenStrength, int protracted, std::vector<double> airmat,
@@ -27,8 +27,8 @@ PhylSimModel::PhylSimModel(int X, int Y, int dispersal, int simulationEnd, doubl
 #ifdef DEBUG
   std::cout << "Running simulation with \n";
   std::cout << "Dispersal " << dispersal << "; cutoff " << dispersalCutoff << "\n";
-  std::cout << "Competition " << negativeDens << "; strength " << nDDStrength << " cutoff " << densityCutoff << "\n";
-  std::cout << "Mutualism " << positiveDens << "; strength " << pDDStrength << " cutoff " << densityCutoff << "\n";
+  std::cout << "Competition " << negativeDens << "; strength " << nDDStrength << " cutoff " << nDensCutoff << "\n";
+  std::cout << "Mutualism " << positiveDens << "; strength " << pDDStrength << " cutoff " << pDensCutoff << "\n";
   std::cout << "Environment " << env << "; strength " << envStrength << "\n";
   std::cout << "\n---- debug message for development purposes, remove "
                "debug switch in debug.h for turning this off \n\n";
@@ -37,14 +37,14 @@ PhylSimModel::PhylSimModel(int X, int Y, int dispersal, int simulationEnd, doubl
   if (dispersal == 1) {
     m_Global = new GlobalEnvironment(
         X, Y, dispersal, neutral, negativeDens, positiveDens, env, mort, repro, simulationEnd, specRate,
-        dispersalCutoff, nDensCutoff, pDensCutoff, mortalityStrength, nDDStrength, pDDStrength, envStrength, fission,
+        dispersalCutoff, nDensCutoff, pDensCutoff, mortStrength, nDDStrength, pDDStrength, envStrength, fission,
         redQueen, redQueenStrength, protracted, airmat, soilmat, nDDNicheWidth, pDDNicheWidth, envNicheWidth);
     m_Local = NULL;
   } else if (dispersal == 2 || dispersal == 3) {
     m_Global = NULL;
     m_Local = new LocalEnvironment(
         X, Y, dispersal, neutral, negativeDens, positiveDens, env, mort, repro, simulationEnd, specRate,
-        dispersalCutoff, nDensCutoff, pDensCutoff, mortalityStrength, nDDStrength, pDDStrength, envStrength, fission,
+        dispersalCutoff, nDensCutoff, pDensCutoff, mortStrength, nDDStrength, pDDStrength, envStrength, fission,
         redQueen, redQueenStrength, protracted, airmat, soilmat, nDDNicheWidth, pDDNicheWidth, envNicheWidth);
   }
 

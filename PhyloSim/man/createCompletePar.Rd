@@ -68,9 +68,9 @@ If \code{runs} is a sequence of generations, intermediate results are saved. E.g
 
 The model incorporates three main ecological processes, each controlled by a strength parameter and a corresponding niche width parameter:
 \itemize{
-\item \strong{Negative Density Dependence (Competition):} Controlled by \code{negativeDensity}, \code{nDDNicheWidth}, and \code{nDensityCut}. Higher \code{negativeDensity} increases competitive pressure. Smaller \code{nDDNicheWidth} results in more trait-specific filtering. \code{nDensityCut} defines the spatial scale of competition.
-\item \strong{Positive Density Dependence (Facilitation):} Controlled by \code{positiveDensity}, \code{pDDNicheWidth}, and \code{pDensityCut}. Higher \code{positiveDensity} increases facilitative interactions. Smaller \code{pDDNicheWidth} increases trait specificity. \code{pDensityCut} defines the spatial scale of facilitation.
-\item \strong{Environmental Selection:} Controlled by \code{environment} and \code{envNicheWidth}. Higher \code{environment} increases environmental filtering. Smaller \code{envNicheWidth} leads to narrower environmental tolerances.
+\item Negative Density Dependence (Competition): Controlled by \code{negativeDensity}, \code{nDDNicheWidth}, and \code{nDensityCut}. Higher \code{negativeDensity} increases competitive pressure. Smaller \code{nDDNicheWidth} results in more trait-specific filtering. \code{nDensityCut} defines the spatial scale of competition.
+\item Positive Density Dependence (Facilitation): Controlled by \code{positiveDensity}, \code{pDDNicheWidth}, and \code{pDensityCut}. Higher \code{positiveDensity} increases facilitative interactions. Smaller \code{pDDNicheWidth} increases trait specificity. \code{pDensityCut} defines the spatial scale of facilitation.
+\item Environmental Selection: Controlled by \code{environment} and \code{envNicheWidth}. Higher \code{environment} increases environmental filtering. Smaller \code{envNicheWidth} leads to narrower environmental tolerances.
 }
 
 If \code{type = "Rneutral"} the model will run entirely in R. This mode is for testing/teaching only and is significantly slower. The output is reduced and includes only the species landscape and parameter set.

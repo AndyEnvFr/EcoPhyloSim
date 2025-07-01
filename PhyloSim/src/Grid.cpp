@@ -135,8 +135,6 @@ Landscape::Landscape(int xsize, int ysize, int type, bool neutral, bool ndd, boo
       this->m_Individuals[cols][rows].m_nDDStrength = m_nDDStrength;
       this->m_Individuals[cols][rows].m_pDDStrength = m_pDDStrength;
       this->m_Individuals[cols][rows].m_envNicheWidth = m_envNicheWidth;
-      this->m_Individuals[cols][rows].m_nDDNicheWidth = m_nDDNicheWidth;
-      this->m_Individuals[cols][rows].m_pDDNicheWidth = m_pDDNicheWidth;
 
       // this->individuals[cols][rows].Species->date_of_extinction =
       // runs;
@@ -388,14 +386,16 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
       // every m_mortalityStrength'th step the randomly chosen
       // individual dies, no matter its fitness
       if (m_mortality && event % m_mortalityStrength != 0) {
-        double weight = m_Individuals[x_coordinate][y_coordinate].getFitness(
+        double fitness = m_Individuals[x_coordinate][y_coordinate].getFitness(
             m_Environment[x_coordinate * m_Ydimensions + y_coordinate].first, m_Env, m_nDD, m_pDD, generation,
             m_redQueenStrength, m_redQueen);
         // important!! the frequency in relation to the base mortality
         // controls the intensity of the mechanisms
-        double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 1.0);
+
+        // randomDouble(0,3) because fitness ranges from [0,3] with baseline 1. Hence baseline mortality = 1/3
+        double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 3.0); 
         // std::cout<<weight<<"\n"; // DEBUG
-        if (weight > chanceOfDeath) {
+        if (fitness > chanceOfDeath) {
           continue;
         }
       }
@@ -762,7 +762,7 @@ void LocalEnvironment::reproduce(unsigned int generation) {
       double weight = m_Individuals[x_coordinate][y_coordinate].getFitness(
           m_Environment[x_coordinate * m_Ydimensions + y_coordinate].first, m_Env, m_nDD, m_pDD, generation,
           m_redQueenStrength, m_redQueen);
-      double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 1.0);
+      double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 3.0);
       if (weight > chanceOfDeath)
         continue;
     }
@@ -840,8 +840,8 @@ void LocalEnvironment::reproduce(unsigned int generation) {
 // update the density around an individual with
 
 // helper function calculates generic relatedness
-double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cutoff) {
-  double relatedness = 0.0;
+double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cutoff, double densityNicheWidth) {
+  double unrelatedness = 0.0;
 
   for (int X = -cutoff; X <= cutoff; X++) {
     int yLims = floor(sqrt(cutoff * cutoff - X * X)); // avoid diagonal bias
@@ -855,10 +855,11 @@ double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cuto
 
       double a = m_Individuals[focus_x][focus_y].m_CompetitionMarker;
       double b = m_Individuals[neighborX][neighborY].m_CompetitionMarker;
-      relatedness += std::abs(a - b);
+       // gauss kernel: closely related ind. have high impact, far relation minimal impact
+      unrelatedness += exp(-0.5 * pow((a - b) / densityNicheWidth, 2.0));
     }
   }
-  return relatedness;
+  return unrelatedness;
 }
 
 // Update density for both negative and positive density dependence
@@ -871,8 +872,8 @@ void LocalEnvironment::densityUpdate(int x, int y) {
       int focus_x = ((x + X + m_Xdimensions) % m_Xdimensions);
       int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
 
-      double nRelatedness = calculateRelatedness(focus_x, focus_y, m_nDensCutoff);
-      m_Individuals[focus_x][focus_y].m_nLocalDensity = nRelatedness / cellsWithin_N_DensCutoff;
+      double nUnrelatedness = calculateRelatedness(focus_x, focus_y, m_nDensCutoff, m_nDDNicheWidth);
+      m_Individuals[focus_x][focus_y].m_nLocalDensity = nUnrelatedness / cellsWithin_N_DensCutoff;
     }
   }
 
@@ -883,9 +884,9 @@ void LocalEnvironment::densityUpdate(int x, int y) {
       int focus_x = ((x + X + m_Xdimensions) % m_Xdimensions);
       int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
 
-      double pRelatedness = calculateRelatedness(focus_x, focus_y, m_pDensCutoff);
+      double pUnrelatedness = calculateRelatedness(focus_x, focus_y, m_pDensCutoff, m_pDDNicheWidth);
       // Assuming you have a separate field for positive density
-      m_Individuals[focus_x][focus_y].m_pLocalDensity = pRelatedness / cellsWithin_P_DensCutoff;
+      m_Individuals[focus_x][focus_y].m_pLocalDensity = pUnrelatedness / cellsWithin_P_DensCutoff;
     }
   }
 }

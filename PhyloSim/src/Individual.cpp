@@ -28,7 +28,7 @@ Individual::Individual() {
   this->m_nLocalDensity = 0.0; // density experienced around itself, will
   // be updated automatically
   this->m_pLocalDensity = 0.0;
-  
+
   this->m_Age = 0;
   this->m_incip_Age = -99999999;
 
@@ -39,12 +39,6 @@ Individual::Individual() {
   // END OBSOLETE
 
   this->m_envNicheWidth = 0.03659906; // environmental niche width, see getFitness
-  this->m_nDDNicheWidth = 0.1;        // set because LocalDensity can be max 0.25 (unrelated
-                                      // individuals & densityCutoff = 1 (i.e., 4 niehgb.): 1 / 4).
-                                      // if Width is too high (e.g., 1), the max(localDensity)
-                                      // value of .25 will give similar out as min(localDensity)
-                                      // value (i.e., 0)
-  this->m_pDDNicheWidth = 0.1;        // arbitrarily set default to 0.1
   this->m_Mean = 0.5;                 // environmental trait
   this->m_CompetitionMarker = 0.5;    // competition trait
   this->m_NeutralMarker = 0.5;        // neutral trait
@@ -73,8 +67,6 @@ Individual::Individual(const Individual &ind) {
   //	this -> m_DensityStrength = ind.m_DensityStrength;
   //	this -> m_Weight = ind.m_Weight;
   this->m_envNicheWidth = ind.m_envNicheWidth;
-  this->m_nDDNicheWidth = ind.m_nDDNicheWidth;
-  this->m_pDDNicheWidth = ind.m_pDDNicheWidth;
   this->m_Mean = ind.m_Mean;
 
   this->m_CompetitionMarker = ind.m_CompetitionMarker;
@@ -106,8 +98,6 @@ void Individual::operator=(const Individual &ind) {
   //	this -> m_Weight = ind.m_Weight;
 
   this->m_envNicheWidth = ind.m_envNicheWidth;
-  this->m_nDDNicheWidth = ind.m_nDDNicheWidth;
-  this->m_pDDNicheWidth = ind.m_pDDNicheWidth;
 
   this->m_Mean = ind.m_Mean;
   this->m_CompetitionMarker = ind.m_CompetitionMarker;
@@ -157,7 +147,7 @@ double Individual::getSeedsTo(int rel_x, int rel_y, int dispersal_type, double t
 }
 
 /**
- * gets the fitness of the current individual
+ * gets the fitness of the current individual. Fitness has basline 1 and can range from [0,3]
  * @param temp environmental parameter
  * @param env environment acting
  * @param ndd density acting (favors dissimilar traits)
@@ -167,40 +157,28 @@ double Individual::getSeedsTo(int rel_x, int rel_y, int dispersal_type, double t
  */
 double Individual::getFitness(double temp, bool env, bool ndd, bool pdd, int generation, double redQueenStrength,
                               double redQueen) {
-  double out = (DBL_MIN * 100.0); // TODO: Why this?
+  double out = 1.0; // baseline fitness allows subtraction via ndd
 
   // changed by andy
   if (env)
-    out += m_envStrength * exp(-0.5 * pow((temp - m_Mean) / m_envNicheWidth, 2.0)) + 1 -
-           m_envStrength; // environmental niche
+    out += m_envStrength * exp(-0.5 * pow((temp - m_Mean) / m_envNicheWidth, 2.0)); // environmental niche
+
+  // localdensity is transformed via gaussian kernel in grid.cpp LocalEnvironment::densityUpdate
   if (ndd)
-    out += m_nDDStrength * (1.0 - exp(-0.5 * pow(m_nLocalDensity / m_nDDNicheWidth, 2))) + 1 -
-           m_nDDStrength; // density-dependent niche with mean = 0
-  // nLocalDensity: the lower, the more and closer related neighbors (0 ~
-  // same traits). min = 0, max = 0.25 (1(dissimilar traits) /
-  // 4(densityCut = 1 -> 4 neighbors))
-  // +++out, if dissimilar traits; 0+out, if same traits.
+  out -= m_nDDStrength * m_nLocalDensity;
+
+  // pdd and ndd are defined likewise. Just pdd is added and ndd is subtracted from fitness
   if (pdd)
-    out += m_pDDStrength * exp(-0.5 * pow(m_pLocalDensity / m_pDDNicheWidth, 2)) + 1 -
-           m_pDDStrength; // positive density dependence
-  // pLocalDensity: the lower, the more and closer related neighbors (0 ~
-  // same traits). min = 0, max = 0.25
-  // +++out, if same traits; 0+out, if dissimilar traits.
+    out += m_pDDStrength * m_pLocalDensity;
 
-  // Adjust bounds when multiple processes are active
-  int activeProcesses = (env ? 1 : 0) + (ndd ? 1 : 0) + (pdd ? 1 : 0);
-  if (activeProcesses > 1)
-    out = out / activeProcesses; // bounds out between [0,1]
-  // caution: this changes do not consider interaction with redQueen
-  // mechanism. For my purpouse redQueen remains off !
-
-  // Implementation of the redQueen Mechanism
+  // Implementation of the redQueen Mechanism                      !!! IGNORED FOR CDD AND PDD IMPLEMENTATION !!! needs
+  // to be adjusted
   if ((redQueenStrength != 0) || (redQueen != 0)) {
 
     // Need to set a values to give the boost in case of the red Queen
     // Speciation. The value here is randomly chosen.
     if (!env && !ndd && !pdd)
-      out = 0.01;
+      out = (DBL_MIN * 100.0);
 
     // The new fitness value is calculated as a function of the specie's
     // age

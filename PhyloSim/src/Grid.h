@@ -36,6 +36,8 @@ class Landscape {
 
 public:
 int m_Cutoff;
+double m_nDDNicheWidth;
+double m_pDDNicheWidth;
 int m_nDensCutoff;
 int m_pDensCutoff;
 int m_Dispersal_type;
@@ -69,8 +71,6 @@ double m_Speciation_Rate;
 double cellsWithin_N_DensCutoff;
 double cellsWithin_P_DensCutoff;
 double m_envNicheWidth;
-double m_nDDNicheWidth;
-double m_pDDNicheWidth;
 double m_envStrength;
 double m_nDDStrength;
 double m_pDDStrength;
@@ -88,7 +88,7 @@ void tempChange(int sign, double magnitude);
 void moistChange(int sign, double magnitude);
 
 // accessbile for subclasses. Are overwritten there
-virtual double calculateRelatedness(int, int, int) { return 0.0; }
+virtual double calculateRelatedness(int, int, int, double) { return 0.0; }
 virtual void densityUpdate(int, int) {}
 
 Landscape();
@@ -142,7 +142,7 @@ public:
   LocalEnvironment();
 
   // for local environment: get densities from neighbors
-  double calculateRelatedness(int focus_x, int focus_y, int cutoff) override;
+  double calculateRelatedness(int focus_x, int focus_y, int cutoff, double densityNicheWidth) override;
   void densityUpdate(int x, int y) override;
 
 
