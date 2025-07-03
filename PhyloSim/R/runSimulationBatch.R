@@ -26,20 +26,13 @@ runSimulationBatch <- function(pars, parallel = FALSE, backup = FALSE, strip = N
     
     out <- foreach(i=1:length(pars), .packages = c("PhyloSim")) %dopar%{
       
-      if(backup == TRUE){
-        name <- paste(pars[[i]]$scenario, "_params.RData", sep="")
-        par <- pars[[i]]
-        save(par, file = name)
-      }
-      
-      # TODO: remove this after test
-      OUT <- tryCatch(runSimulation(pars[[i]]),
-                      error = function(e) NULL)
+      OUT <- runSimulation(pars[[i]])
       
       if(backup == TRUE){
-        name <- paste(pars[[i]]$scenario, "_out.RData", sep="")
-        save(OUT, file = name)
+        name <- paste0(pars[[i]]$scenario, ".rds")
+        saveRDS(OUT, file = name)
       }
+      
       if(!is.null(strip) && !is.null(OUT)) {
         if(strip == "summaries") {
           OUT <- OUT$Output[[1]]$summaries
@@ -59,8 +52,9 @@ runSimulationBatch <- function(pars, parallel = FALSE, backup = FALSE, strip = N
       OUT <- runSimulation(pars[[i]])
       
       if(backup == TRUE){
-        name <- paste(pars[[i]]$scenario, ".RData", sep="")
-        save(OUT, file = name)
+
+        name <- paste0(pars[[i]]$scenario, ".rds")
+        saveRDS(OUT, file = name)
       }
       if(!is.null(strip)) {
         if(strip == "summaries") {
