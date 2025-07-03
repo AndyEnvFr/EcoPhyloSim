@@ -4,65 +4,76 @@
 \alias{createCompletePar}
 \title{Parameter Generator}
 \usage{
-createCompletePar(x = 50, y = 50, dispersal = "global", runs = 100,
-  specRate = 1, density = 0, environment = 0,
+createCompletePar(x = 50, y = 50, type = "base", dispersal = "global",
+  runs = 100, specRate = 1, negativeDensity = 0, nDensityCut = 1,
+  nDDNicheWidth = 0.1, positiveDensity = 0, pDensityCut = 1,
+  pDDNicheWidth = 0.1, environment = 0, envNicheWidth = 0.03659906,
   fitnessActsOn = "mortality", fitnessBaseMortalityRatio = 10,
-  densityCut = 1, seed = NULL, type = "base", fission = 0,
-  redQueen = 0, redQueenStrength = 0, protracted = 0, airmat = 1,
-  scenario = NULL, calculateSummaries = FALSE,
-  convertToBinaryTree = TRUE, prunePhylogeny = TRUE)
+  seed = NULL, fission = 0, redQueen = 0, redQueenStrength = 0,
+  protracted = 0, airmat = 1, scenario = NULL,
+  calculateSummaries = FALSE, convertToBinaryTree = TRUE,
+  prunePhylogeny = TRUE)
 }
 \arguments{
-\item{x}{Integer, Dimension of the model landscape in x-direction}
+\item{x}{Integer, dimension of the model landscape in x-direction}
 
-\item{y}{Integer, Dimension of the model landscape in y-direction}
-
-\item{dispersal}{Integer. Type 0 or "global" for global dispersion. For local dispersion all integers >=1 set the dispersal distance.}
-
-\item{runs}{Integer or vector of Integers, Number of generations or sequence of generations the model runs over (see Details).}
-
-\item{specRate}{Integer, Number of Individuals introduced to the community in each generation}
-
-\item{density}{Float, determining whether or how strong the density dependence influences the model. By default (density=0) there is no density dependence. The higher the value of the parameter, the stronger is the density dependence.}
-
-\item{environment}{Float, determining whether or how strong the environment influences the model.  By default (environment=0) there is no influence of the environment. The higher the value of the parameter, the stronger is the influence of the environment. Environment value must be between 0 and 1.}
-
-\item{fitnessActsOn}{Character, determining how the fitness influences the individuals. Possible inputs are "mortality" (default), "reproduction" or "both"}
-
-\item{fitnessBaseMortalityRatio}{Integer, determines the fitness based mortality ratio. Must be greater than or equal to 1.}
-
-\item{densityCut}{Integer, defines the effective range of the competition (ignored if density = FALSE)}
-
-\item{seed}{numerical, sets the random seed}
+\item{y}{Integer, dimension of the model landscape in y-direction}
 
 \item{type}{Character, determining which model should be used. "base" is running the default model. Other possibilities are "Leipzig" and "Rneutral" which will run a neutral model purely in R.}
 
-\item{fission}{Integer, determining which fission type should be used. Options are 0 (none = default), 1 (every second individual becomes part of new species) and 2 (population is geographically split in two parts).}
+\item{dispersal}{Integer. Type 0 or "global" for global dispersion. For local dispersion, all integers >=1 set the dispersal distance.}
+
+\item{runs}{Integer or vector of Integers, number of generations or sequence of generations the model runs over (see Details).}
+
+\item{specRate}{Integer, number of individuals introduced to the community in each generation}
+
+\item{negativeDensity, positiveDensity, environment}{Float, defines the strength of the respective ecological process. By default all are 0 (no effect). Higher values increase process strength. See Details for process-specific information.}
+
+\item{nDensityCut, pDensityCut}{Integer, define the spatial cutoff radius for negative and positive density dependence (i.e., the local neighborhood over which competition or facilitation is calculated). Only used if the respective density dependence process is active.}
+
+\item{nDDNicheWidth, pDDNicheWidth, envNicheWidth}{Double, width (σ) of the Gaussian fitness kernel for the respective ecological process. Smaller values imply stronger trait-specific filtering. See Details for defaults and process-specific effects.}
+
+\item{fitnessActsOn}{Character, determining how the fitness influences the individuals. Possible inputs are "mortality" (default), "reproduction" or "both"}
+
+\item{fitnessBaseMortalityRatio}{Integer, determines the fitness-based mortality ratio. Must be greater than or equal to 1.}
+
+\item{seed}{Numeric, sets the random seed}
+
+\item{fission}{Integer, determining which fission type should be used. Options are 0 (none = default), 1 (every second individual becomes part of new species), and 2 (population is geographically split in two parts).}
 
 \item{redQueen}{Float, determining the strength of the fitness decline of an aging species.}
 
-\item{redQueenStrength}{Float, determining the strength of the Red Queen effect. A value > 0 mean a new species gets a fitness boost due to its novelty.}
+\item{redQueenStrength}{Float, determining the strength of the Red Queen effect. A value > 0 means a new species gets a fitness boost due to its novelty.}
 
 \item{protracted}{Integer, determining the time span in generations a new species stays 'incipient' before turning into a 'good' species. Default is 0.}
 
-\item{airmat}{Matrix, deteriming the environment of the simulation. airmat needs to be a matrix with the same dimensions as the grid. Must be scaled between 0 and 1.}
+\item{airmat}{Matrix, determining the environment of the simulation. Must have the same dimensions as the landscape grid and values scaled between 0 and 1.}
 
-\item{scenario}{String, further information you want to add to the parameter set in order to refer to a model run more conveniently.}
+\item{scenario}{String, additional identifier to label a specific parameter set / simulation run.}
 
-\item{calculateSummaries}{Logical, determining wheter summary statistics should be calculated}
+\item{calculateSummaries}{Logical, determining whether summary statistics should be calculated}
 
 \item{convertToBinaryTree}{Logical, determining if the phylogeny should be converted into a binary tree}
 
-\item{prunePhylogeny}{Logical, determining whether the phylogeny should be prune by the internal pruning function}
+\item{prunePhylogeny}{Logical, determining whether the phylogeny should be pruned by the internal pruning function}
 }
 \value{
-A List with parameters
+A list of parameter settings to be used with \code{\link{runSimulation}} or \code{\link{runSimulationBatch}}.
 }
 \description{
 Function to create a list of parameters for biogeographical simulations with \code{\link{runSimulation}} or \code{\link{runSimulationBatch}}
 }
 \details{
-If runs is a sequence of generations, intermediate results are saved. E.g. when runs is c(500, 600, 700), the simulation runs 700 generations in total, and the intermediate results at generations 500 and 600 are saved additionally. The intermediate and end results are saved in the output of \code{runSimulation}. \cr\cr If type = "Rneutral" the model will run entirely in R. This model is to be seen only for test and teaching purpose. To be used in practice it is far too slow. Also the output is reduced. Only the species landscape and the parameter settings will be displayed in the output.
+If \code{runs} is a sequence of generations, intermediate results are saved. E.g., when \code{runs = c(500, 600, 700)}, the simulation runs 700 generations in total, and results at generations 500 and 600 are stored as checkpoints.
+
+The model incorporates three main ecological processes, each controlled by a strength parameter and a corresponding niche width parameter:
+\itemize{
+\item Negative Density Dependence (Competition): Controlled by \code{negativeDensity}, \code{nDDNicheWidth}, and \code{nDensityCut}. Higher \code{negativeDensity} increases competitive pressure. Smaller \code{nDDNicheWidth} results in more trait-specific filtering. \code{nDensityCut} defines the spatial scale of competition.
+\item Positive Density Dependence (Facilitation): Controlled by \code{positiveDensity}, \code{pDDNicheWidth}, and \code{pDensityCut}. Higher \code{positiveDensity} increases facilitative interactions. Smaller \code{pDDNicheWidth} increases trait specificity. \code{pDensityCut} defines the spatial scale of facilitation.
+\item Environmental Selection: Controlled by \code{environment} and \code{envNicheWidth}. Higher \code{environment} increases environmental filtering. Smaller \code{envNicheWidth} leads to narrower environmental tolerances.
+}
+
+If \code{type = "Rneutral"} the model will run entirely in R. This mode is for testing/teaching only and is significantly slower. The output is reduced and includes only the species landscape and parameter set.
 }
 \examples{
 ## Define a parameter set
