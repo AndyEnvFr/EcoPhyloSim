@@ -33,7 +33,7 @@ getSpecTime.PhyloSim <- function(runs, thinning_factor = NULL, ymax = NULL, plot
   }
   
   if (plot) {
-    plot(result$year, result$spec_rich, type = "b", ylab = "richness", xlab = "generation",
+    plot(result$year, result$spec_rich, type = "l", ylab = "richness", xlab = "generation",
          ylim = if (!is.null(ymax)) c(0, ymax) else c(0, max(result$spec_rich)),
          main = "Species Richness Over Time")
   }
