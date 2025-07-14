@@ -4,14 +4,15 @@
 \alias{runSimulationBatch}
 \title{Batch runner}
 \usage{
-runSimulationBatch(pars, parallel = FALSE, backup = FALSE, strip = NULL)
+runSimulationBatch(pars, parallel = FALSE, backup_path = NULL,
+  strip = NULL)
 }
 \arguments{
 \item{pars}{A list of parameter sets as created by \code{\link{createCompletePar}}}
 
 \item{parallel}{Integer, determining the number of cores used for parallel computing. If parallel = "auto", n-1 cores are used.}
 
-\item{backup}{Logical, determining whether the results of the individual scenario runs should be saved as a workspace image (advised if the simulation takes a long time, or if the individual scenarios vary greatly in runtime. Default is FALSE)}
+\item{backup_path}{Char, defining storage location of the individual scenario runs saved as a workspace image (advised if the simulation takes a long time, or if the individual scenarios vary greatly in runtime. Default is NULL)}
 
 \item{strip}{NULL or "summaries", determining whether the whole simulation or only the summary statistics should be returned.}
 }

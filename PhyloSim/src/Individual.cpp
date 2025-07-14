@@ -165,11 +165,19 @@ double Individual::getFitness(double temp, bool env, bool ndd, bool pdd, int gen
 
   // localdensity is transformed via gaussian kernel in grid.cpp LocalEnvironment::densityUpdate
   if (ndd)
-  out -= m_nDDStrength * m_nLocalDensity;
+    out -= m_nDDStrength * m_nLocalDensity;
+
+#ifdef DEBUG_ANDY
+  std::cout << "m_nLocalDensity: " << m_nLocalDensity << "  m_nDDStrength: " << m_nDDStrength << "\n";
+#endif
 
   // pdd and ndd are defined likewise. Just pdd is added and ndd is subtracted from fitness
   if (pdd)
     out += m_pDDStrength * m_pLocalDensity;
+
+#ifdef DEBUG_ANDY
+  std::cout << "m_pLocalDensity: " << m_pLocalDensity << "  m_pDDStrength: " << m_pDDStrength << "\n";
+#endif
 
   // Implementation of the redQueen Mechanism                      !!! IGNORED FOR CDD AND PDD IMPLEMENTATION !!! needs
   // to be adjusted
