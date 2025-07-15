@@ -183,11 +183,6 @@ double Individual::getFitness(double temp, bool env, bool ndd, bool pdd, int gen
   // to be adjusted
   if ((redQueenStrength != 0) || (redQueen != 0)) {
 
-    // Need to set a values to give the boost in case of the red Queen
-    // Speciation. The value here is randomly chosen.
-    if (!env && !ndd && !pdd)
-      out = (DBL_MIN * 100.0);
-
     // The new fitness value is calculated as a function of the specie's
     // age
     out = out +
