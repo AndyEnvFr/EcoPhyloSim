@@ -108,7 +108,7 @@ List callModel(int x, int y, int dispersal, IntegerVector runs, double specRate,
           indCounter++;
         }
       }
-#ifndef PHYL_ON
+#ifndef PHYL_OFF
       phylSimModel.m_Global->m_Phylogeny.prunePhylogeny(prevNGen);
       std::string phyloPass("\0");
 #endif
@@ -119,7 +119,7 @@ List callModel(int x, int y, int dispersal, IntegerVector runs, double specRate,
       // consistency checks -> length, etc
 #endif
 
-#ifndef PHYL_ON
+#ifndef PHYL_OFF
       if (prunePhylogeny) {
         phyloPass =
             phylSimModel.m_Global->m_Phylogeny.writePhylogenyR(1, phylSimModel.m_Global->m_Phylogeny.m_PrunedPhylo);
@@ -133,7 +133,7 @@ List callModel(int x, int y, int dispersal, IntegerVector runs, double specRate,
       std::cout << "after writePhylogenyR" << std::endl;
 #endif
 
-#ifndef PHYL_ON
+#ifndef PHYL_OFF
       char *cstr = new char[phyloPass.length() + 1];
       std::strcpy(cstr, phyloPass.c_str());
       phyloOut[0] = cstr;
@@ -151,12 +151,13 @@ List callModel(int x, int y, int dispersal, IntegerVector runs, double specRate,
           indCounter++;
         }
       }
-#ifndef PHYL_ON
+
+#ifndef PHYL_OFF
       phylSimModel.m_Local->m_Phylogeny.prunePhylogeny(prevNGen);
       std::string phyloPass("\0");
 #endif
 
-#ifndef PHYL_ON
+#ifndef PHYL_OFF
       if (prunePhylogeny) {
         phyloPass =
             phylSimModel.m_Local->m_Phylogeny.writePhylogenyR(1, phylSimModel.m_Local->m_Phylogeny.m_PrunedPhylo);
@@ -166,13 +167,13 @@ List callModel(int x, int y, int dispersal, IntegerVector runs, double specRate,
       }
 #endif
 
-#ifndef PHYL_ON
+#ifndef PHYL_OFF
       char *cstr = new char[phyloPass.length() + 1];
       std::strcpy(cstr, phyloPass.c_str());
       phyloOut[0] = cstr;
       delete[] cstr;
-    }
 #endif
+    }
 
     Rcpp::List listResults =
         Rcpp::List::create(Rcpp::Named("Species") = specOut, Rcpp::Named("EnvTrait") = traitOut,
