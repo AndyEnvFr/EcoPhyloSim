@@ -32,7 +32,7 @@ Imports:
 Suggests:
     knitr
 LinkingTo: Rcpp
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Roxygen: list(old_usage = TRUE, markdown = TRUE)
 LazyData: true
 VignetteBuilder: knitr
