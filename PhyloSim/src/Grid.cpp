@@ -142,8 +142,11 @@ Landscape::Landscape(int xsize, int ysize, int type, bool neutral, bool ndd, boo
   }
   // TODO - should the species be updated?
 
-  // Write the last individual in the phylogeny
+// Write the last individual in the
+
+#ifndef PHYL_OFF
   m_Phylogeny.updatePhylogeny(m_Individuals[xsize - 1][ysize - 1].m_Species);
+#endif
 
   // Set up Environment
   // if no environment (airmat) is passed, generate one
@@ -968,7 +971,10 @@ void Landscape::speciation(unsigned int generation) {
               new Species(m_Global_Species_Counter, m_Individuals[k][j].m_Species->get_species_ID(), generation,
                           std::make_pair(k, j), m_SimulationEnd);
           m_Individuals[k][j].evolveDuringSpeciation();
+
+          #ifndef PHYL_OFF
           m_Phylogeny.updatePhylogeny(m_Individuals[k][j].m_Species);
+          #endif
 
           if (m_nDD)
             densityUpdate(k, j);

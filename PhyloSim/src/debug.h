@@ -5,6 +5,10 @@
  *      Author: Florian Hartig
  */
 
-//#ifndef DEBUG
-//#define DEBUG
-//#endif
+// #ifndef DEBUG
+// #define DEBUG
+// #endif
+
+#ifndef PHYL_OFF
+#define PHYL_OFF
+#endif
