@@ -15,7 +15,8 @@ getTorus <- function(simu, overwrite = FALSE, radius = NULL) {
 #' @rdname getTorus
 #' @method getTorus PhyloSim
 getTorus.PhyloSim <- function(simu, overwrite = TRUE, radius = NULL) {
-  r <- if (is.null(radius)) simu$Model$densityCut else radius # by default take density cut as the radius
+  # take max dc of ndd and pdd
+  r <- if (is.null(radius)) max(simu$Model$pDensityCut,simu$Model$nDensityCut) else radius # by default take density cut as the radius
   
   if (!is.matrix(simu$Output[[1]]$mortMat)) {
     simu <- getMortality(simu) # adds mortalities and generation names to simu$Output$__generationName_
