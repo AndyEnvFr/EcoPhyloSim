@@ -103,8 +103,8 @@ getMatToTab.PhyloSim <- function(simu, detailedParams = FALSE) {
     # Add parameter columns
     if (detailedParams) {
       param_data <- data.frame(
-        pDD = ifelse(simu$Model$positiveDensity, simu$Model$pDDStrength, 0) %>% rep(.,n_rows ),
-        nDD = ifelse(simu$Model$negativeDensity, simu$Model$nDDStrength, 0) %>% rep(.,n_rows ),
+        pDD = rep(ifelse(simu$Model$positiveDensity, simu$Model$pDDStrength, 0),n_rows),
+        nDD = rep(ifelse(simu$Model$negativeDensity, simu$Model$nDDStrength, 0), n_rows),
         pDDVar = rep(simu$Model$pDDNicheWidth, n_rows),
         nDDVar = rep(simu$Model$nDDNicheWidth, n_rows),
         pDC = rep(simu$Model$pDensityCut, n_rows),
