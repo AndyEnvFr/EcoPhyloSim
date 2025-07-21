@@ -1,70 +1,99 @@
 #' @title Rank Abundance Curve
 #' @description Plots the Rank Abundance Curve for a given community. 
-#' @param simu Simulation output of the class "Phylosim", usually consisting out of several lists. Needs at least the spatial distribution of the species stored in a matrix ($specMat)
-#' @param which.result Integer, determines which result should be used. This argument is only usefull if your 'runs' argument in \code{\link{createCompletePar}} contains more than one element. By default (NULL), the last result is used. If you choose "all" all results are shown in one plot (see 'Details).
-#' @param plot determining whether to plot the RAC as "line"(default) or "bar".
-#' @param title String, determining the title of the plot.
-#' @details Each species is given a rank according to their abundance (highest = rank 1). Then the the species' abundance is plotted in dependency of their rank. It can be used as an indicator for the ammount of equally abundant species a community can support. \cr\cr If which.result = "all" all intermediate results are shown in one plot. The colors of the lines are plotted as a gradient from blue (first results) to red (end result).
-#' @return A dataframe containing the ranked abundances, sorted by ascending rank. If which.result = "all" only the plot will be returned.
-#' @example inst/examples/plotRAC-help.R
+#' @param runs A simulation object of class "PhyloSim" or "PhylosimList".
+#' @param which.result Integer or "all". For PhyloSim, selects the result(s) to use. For PhylosimList, applies to all.
+#' @param plot_type Type of plot: "line" (default) or "bar".
+#' @param title Optional plot title. For PhylosimList, a character vector or NULL.
+#' @param ymax Numeric, y-axis max. If NULL, uses automatic scaling.
+#' @param xmax Numeric, x-axis max. If NULL, uses automatic scaling.
+#' @return Dataframe(s) with rank-abundance values (only if not which.result="all").
 #' @export
+rac <- function(runs, which.result = NULL, plot_type = "line", title = NULL, ymax = NULL, xmax = NULL) {
+  UseMethod("rac")
+}
 
-rac <- function(simu,which.result=NULL, plot="line", title="RAC"){
+#' @rdname rac
+#' @method rac PhyloSim
+#' @export
+rac.PhyloSim <- function(runs, which.result = NULL, plot_type = "line", title = NULL, ymax = NULL, xmax = NULL) {
+  if (is.null(which.result)) which.result <- length(runs$Output)
   
-  if(is.null(which.result)) which.result = length(simu$Output) 
-  
-  if(is.null(which.result) == FALSE){
-    if(which.result == "all"){
-      if(plot=="bar")stop("Argument 'bar' not possible for which.result='all'")
-      simulations <- c(1:length(simu$Output))
-    }else{
-      simulations<-which.result
-    } 
+  if (which.result == "all") {
+    if (plot_type == "bar") stop("Argument 'bar' not possible for which.result='all'")
+    simulations <- seq_along(runs$Output)
+  } else {
+    simulations <- which.result
   }
   
   colfunc <- colorRampPalette(c("blue", "red"))
-  cols<-colfunc(length(simulations))
+  cols <- colfunc(length(simulations))
   
-  RAC<-list()
-  max_abundance<-0
-  max_rank<-0
+  RAC <- list()
+  max_abundance <- 0
+  max_rank <- 0
   
-  for(i in simulations){
-    simu_t <- simu$Output[[i]]
-    matrix <- simu_t$specMat
-    
+  for (i in simulations) {
+    matrix <- runs$Output[[i]]$specMat
     Abundances <- as.data.frame(table(matrix))
-    sel <- order(Abundances$Freq, decreasing=T)
-    RAC[[i]] <- data.frame(Rank = seq(1,length(Abundances$Freq),1), 
-                  Abundance = Abundances$Freq[sel], Species = Abundances$matrix[sel])
-
-    if(max(RAC[[i]]$Abundance)>max_abundance) max_abundance<-max(RAC[[i]]$Abundance)
-    if(max(RAC[[i]]$Rank)>max_rank) max_rank<-max(RAC[[i]]$Rank)
-    
+    sel <- order(Abundances$Freq, decreasing = TRUE)
+    RAC[[i]] <- data.frame(
+      Rank = seq_len(nrow(Abundances)),
+      Abundance = Abundances$Freq[sel],
+      Species = Abundances$matrix[sel]
+    )
+    max_abundance <- max(max_abundance, max(RAC[[i]]$Abundance))
+    max_rank <- max(max_rank, max(RAC[[i]]$Rank))
   }
   
-  if(plot=="bar"){
-    barplot(RAC[[i]]$Abundance, log="y",ylab="Log Abundance", xlab="Rank", 
-             main=title, names.arg = RAC$Rank)
+  ylim_max <- if (is.null(ymax)) max_abundance else ymax
+  xlim_max <- if (is.null(xmax)) max_rank else xmax
+  
+  plot_title <- if (!is.null(title)) {
+    title
+  } else if (!is.null(runs$Model$getName)) {
+    runs$Model$getName
+  } else {
+    getNames(runs)$Model$getName
   }
-  if(plot=="line"){
-    if(length(simulations) == 1){
-      plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type="l",log="y",ylab="Log Abundance",
-            xlab="Rank", main=title, lwd=2)
-    }else{
-      for(i in simulations){  
-        if(i ==1){
-          plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type="l", log="y", ylab="Log Abundance", 
-                xlab="Rank", main=title, col=cols[i],xlim=c(0, max_rank), ylim=c(1, max_abundance)) 
-        }else{
-          lines(RAC[[i]]$Rank, RAC[[i]]$Abundance, type="l", main=title, col=cols[i])
+  
+  if (plot_type == "bar") {
+    barplot(RAC[[i]]$Abundance, log = "y", ylab = "Log Abundance", xlab = "Rank",
+            main = plot_title, names.arg = RAC[[i]]$Rank, ylim = c(1, ylim_max))
+  }
+  
+  if (plot_type == "line") {
+    if (length(simulations) == 1) {
+      plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type = "l", log = "y", ylab = "Log Abundance",
+           xlab = "Rank", main = plot_title, lwd = 2, xlim = c(0, xlim_max), ylim = c(1, ylim_max))
+    } else {
+      for (i in simulations) {
+        if (i == simulations[1]) {
+          plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type = "l", log = "y", ylab = "Log Abundance",
+               xlab = "Rank", main = plot_title, col = cols[i], xlim = c(0, xlim_max), ylim = c(1, ylim_max))
+        } else {
+          lines(RAC[[i]]$Rank, RAC[[i]]$Abundance, col = cols[i])
         }
       }
     }
   }
-  if(length(simulations)==1) return(RAC[[simulations]]) 
+  
+  if (length(simulations) == 1) return(RAC[[simulations]])
 }
 
-
-
-
+#' @rdname rac
+#' @method rac PhylosimList
+#' @export
+rac.PhylosimList <- function(runs, which.result = NULL, plot_type = "line", title = NULL, ymax = NULL, xmax = NULL) {
+  if (!is.null(title) && length(title) != length(runs)) {
+    warning("Length of title vector does not match length of runs. Using automatic titles.")
+    title <- NULL
+  }
+  
+  results <- lapply(seq_along(runs), function(i) {
+    current_title <- if (!is.null(title)) title[i] else NULL
+    rac(runs[[i]], which.result = which.result, plot_type = plot, title = current_title, ymax = ymax, xmax = xmax)
+  })
+  
+  names(results) <- names(runs)
+  return(results)
+}

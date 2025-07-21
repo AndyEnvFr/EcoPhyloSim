@@ -77,19 +77,19 @@ runSimulation <- function(par) {
       }
     }
 
-    if (!is.null(par$envNicheWidth) && par$envNicheWidth <= 0) {
+    if (par$environment && !is.null(par$envNicheWidth) && par$envNicheWidth <= 0) {
       stop("envNicheWidth must be a positive number (used as standard deviation in the environmental kernel)")
     }
 
-    if (!is.null(par$nDDNicheWidth) && par$nDDNicheWidth <= 0) {
+    if (par$negativeDensity && !is.null(par$nDDNicheWidth) && par$nDDNicheWidth <= 0) {
       stop("nDDNicheWidth must be a positive number (used as standard deviation in the density kernel)")
     }
 
-    if (!is.null(par$pDDNicheWidth) && par$pDDNicheWidth <= 0) {
+    if (par$positiveDensity && !is.null(par$pDDNicheWidth) && par$pDDNicheWidth <= 0) {
       stop("pDDNicheWidth must be a positive number (used as standard deviation in the positive density dependence kernel)")
     }
 
-    if (!is.null(par$nDDStrength) && par$nDDStrength <= 0) {
+    if (par$negativeDensity && !is.null(par$nDDStrength) && par$nDDStrength <= 0) {
       stop("nDDStrength must be a positive number (used as standard deviation in the positive density dependence kernel)")
     }
 
