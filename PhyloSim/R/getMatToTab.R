@@ -2,8 +2,10 @@
 #'
 #' @title Extract Matrices as Long-Format Table
 #' @param simu Object of class \code{PhyloSim} or \code{PhylosimList}
+#' @param detailedParams Logical. If \code{FALSE} (default), returns single \code{params} column.
+#' If \code{TRUE}, returns separate columns for each parameter.
 #' @return A \code{data.frame} with census, individual ID, species ID, mortality status, 
-#' conspecific count, and simulation parameter label (\code{params})
+#' conspecific count, and simulation parameter label(s)
 #' @description Extracts key spatial matrices (ID, species, mortality, conspecific neighborhood) 
 #' from all available generations of a simulation object and converts them to a tabular format
 #' suitable for statistical analysis.
@@ -15,7 +17,8 @@
 #'   \item \code{specId} - Species ID from \code{specMat}
 #'   \item \code{mortNextGen} - Mortality status from the NEXT generation's \code{mortMat}
 #'   \item \code{con} - Number of conspecific neighbors from \code{conNeighMat}
-#'   \item \code{params} - Parameter string label from \code{Model$getName}
+#'   \item \code{params} - Parameter string label from \code{Model$getName} (if \code{detailedParams = FALSE})
+#'   \item Individual parameter columns (if \code{detailedParams = TRUE})
 #' }
 #'
 #' @details
@@ -25,16 +28,19 @@
 #' Note: All values except mortality refer to the current generation. Mortality status
 #' is pulled from the subsequent generation.
 #'
+#' When \code{detailedParams = TRUE}, individual parameter columns are extracted from the
+#' simulation object and added to the output table.
+#'
 #' @seealso \code{\link{getConNeigh}}, \code{\link{getMortality}}, \code{\link{getID}}, \code{\link{getTorus}}
 #' @export
-getMatToTab <- function(simu) {
+getMatToTab <- function(simu, detailedParams = FALSE) {
   UseMethod("getMatToTab")
 }
 
 #' @rdname getMatToTab
 #' @method getMatToTab PhyloSim
 #' @export
-getMatToTab.PhyloSim <- function(simu) {
+getMatToTab.PhyloSim <- function(simu, detailedParams = FALSE) {
   if (!"conNeighMat" %in% names(simu$Output[[1]])) {
     stop("conNeighMat not found. Please preprocess using getConNeigh().")
   }
@@ -44,28 +50,79 @@ getMatToTab.PhyloSim <- function(simu) {
   dimInner <- dim(simu$Output[[1]]$specMat)
   paramName <- simu$Model$getName
   
-  result <- data.frame(
+  # Base columns
+  base_cols <- data.frame(
     census = character(),
     indId = integer(),
     specId = integer(),
     mortNextGen = logical(),
     con = integer(),
-    params = character(),
     stringsAsFactors = FALSE
   )
   
+  # Add parameter columns based on detailedParams flag
+  if (detailedParams) {
+    # Extract individual parameter values
+    param_cols <- data.frame(
+      pDD = numeric(),
+      nDD = numeric(),
+      pDDVar = numeric(),
+      nDDVar = numeric(),
+      pDC = numeric(),
+      nDC = numeric(),
+      disp = numeric(),
+      fao = character(),
+      fbmr = numeric(),
+      sr = numeric(),
+      stringsAsFactors = FALSE
+    )
+  } else {
+    # Single params column
+    param_cols <- data.frame(
+      params = character(),
+      stringsAsFactors = FALSE
+    )
+  }
+  
+  result <- cbind(base_cols, param_cols)
+  
   for (cidx in seq_len(genN - 1)) {
     cen <- census[cidx]
+    n_rows <- dimInner[1] * dimInner[2]
     
+    # Base data
     interim <- data.frame(
-      census = rep(cen, dimInner[1] * dimInner[2]),
+      census = as.numeric(rep(cen, n_rows)),
       indId = as.vector(simu$Output[[cidx]]$idMat),
       specId = as.vector(simu$Output[[cidx]]$specMat),
-      con = as.vector(simu$Output[[cidx]]$conNeighMat),
       mortNextGen = as.vector(simu$Output[[cidx + 1]]$mortMat),
-      params = rep(paramName, dimInner[1] * dimInner[2])
+      con = as.vector(simu$Output[[cidx]]$conNeighMat),
+      stringsAsFactors = FALSE
     )
     
+    # Add parameter columns
+    if (detailedParams) {
+      param_data <- data.frame(
+        pDD = ifelse(simu$Model$positiveDensity, simu$Model$pDDStrength, 0) %>% rep(.,n_rows ),
+        nDD = ifelse(simu$Model$negativeDensity, simu$Model$nDDStrength, 0) %>% rep(.,n_rows ),
+        pDDVar = rep(simu$Model$pDDNicheWidth, n_rows),
+        nDDVar = rep(simu$Model$nDDNicheWidth, n_rows),
+        pDC = rep(simu$Model$pDensityCut, n_rows),
+        nDC = rep(simu$Model$nDensityCut, n_rows),
+        disp = rep(simu$Model$dispersal, n_rows),
+        fao = rep(simu$Model$fitnessActsOn, n_rows),
+        fbmr = rep(simu$Model$fitnessBaseMortalityRatio, n_rows),
+        sr = rep(simu$Model$specRate, n_rows),
+        stringsAsFactors = FALSE
+      )
+    } else {
+      param_data <- data.frame(
+        params = rep(paramName, n_rows),
+        stringsAsFactors = FALSE
+      )
+    }
+    
+    interim <- cbind(interim, param_data)
     result <- rbind(result, interim)
   }
   
@@ -75,6 +132,6 @@ getMatToTab.PhyloSim <- function(simu) {
 #' @rdname getMatToTab
 #' @method getMatToTab PhylosimList
 #' @export
-getMatToTab.PhylosimList <- function(simu) {
-  do.call(rbind, lapply(simu, getMatToTab))
+getMatToTab.PhylosimList <- function(simu, detailedParams = FALSE) {
+  do.call(rbind, lapply(simu, function(x) getMatToTab(x, detailedParams = detailedParams)))
 }

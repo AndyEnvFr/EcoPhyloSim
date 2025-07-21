@@ -41,12 +41,12 @@ getNames <- function(runs) {
 getNames.PhyloSim <- function(runs) {
   m <- runs$Model
   name <- paste0(
-    if (isTRUE(m$density)) paste0("dd", m$compStrength, "_"),
+    ifelse(isTRUE(m$positiveDensity), paste0("pdd", m$pDDStrength, "Var", m$pDDNicheWidth, "Cut", m$pDensityCut, "_"), "pdd0_"),
+    ifelse(isTRUE(m$negativeDensity), paste0("ndd", m$nDDStrength, "Var", m$nDDNicheWidth, "Cut", m$nDensityCut, "_"), "ndd0_"),
     "disp", ifelse(m$dispersal == "global", "G_", paste0(m$dispersal, "_")),
     "sr", m$specRate, "_",
     if (isTRUE(m$environment)) paste0("e", m$envStrength, "_"),
     "fbmr", m$fitnessBaseMortalityRatio, "_",
-    "dc", m$densityCut, "_",
     "fao", ifelse(m$fitnessActsOn == "mortality", "M", "R"),
     if (m$fission > 0) paste0("_fi", m$fission),
     if (m$redQueen > 0) paste0("_rq", m$redQueen),
