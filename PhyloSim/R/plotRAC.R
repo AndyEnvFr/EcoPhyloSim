@@ -91,7 +91,7 @@ rac.PhylosimList <- function(runs, which.result = NULL, plot_type = "line", titl
   
   results <- lapply(seq_along(runs), function(i) {
     current_title <- if (!is.null(title)) title[i] else NULL
-    rac(runs[[i]], which.result = which.result, plot_type = plot, title = current_title, ymax = ymax, xmax = xmax)
+    rac(runs[[i]], which.result = which.result, plot_type = plot_type, title = current_title, ymax = ymax, xmax = xmax)
   })
   
   names(results) <- names(runs)

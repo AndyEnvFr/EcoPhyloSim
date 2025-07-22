@@ -76,19 +76,20 @@ getNames.PhylosimList <- function(runs) {
 #' @param thinning_factor Optional integer to reduce the number of time points for plotting (smootes the line). Turned off by default.
 #' @param ymax Optional numeric; fixed y-axis max for plotting. Usefull for comparing different runs. Turned off by default. 
 #' @param plot Logical; whether to generate plots. Default is TRUE
+#' @param title Optional character; manual title(s) for plot(s). For PhylosimList, should be a vector of same length as list.
 #' @return A \code{data.frame} (for single object) or list of data.frames (for list input)
 #' @description Computes species richness per generation using \code{PhyloSim::specRich()}.
 #' Can be visualized or just returned. Richness values can optionally be thinned.
 #'
 #' @export
-getSpecTime <- function(runs, thinning_factor = NULL, ymax = NULL, plot = TRUE) {
+getSpecTime <- function(runs, thinning_factor = NULL, ymax = NULL, plot = TRUE, title = NULL) {
   UseMethod("getSpecTime")
 }
 #' @rdname getSpecTime
 #' @method getSpecTime PhyloSim
 #' @export
 # TODO: merge getSpecTime and specRich: when specRich is called with "which.result" = "all", getSpecTime can be called.
-getSpecTime.PhyloSim <- function(runs, thinning_factor = NULL, ymax = NULL, plot = TRUE) {
+getSpecTime.PhyloSim <- function(runs, thinning_factor = NULL, ymax = NULL, plot = TRUE, title = NULL) {
   sr <- sapply(seq_along(runs$Output), function(i) {
     PhyloSim::specRich(runs, which.result = i) # uses specRich function. This gives only the richness for one generation, not for a time series.
   })
@@ -101,8 +102,10 @@ getSpecTime.PhyloSim <- function(runs, thinning_factor = NULL, ymax = NULL, plot
   }
   
   if (plot) {
-    # Get title - use getName if it exists, otherwise generate it
-    title <- if (!is.null(runs$Model$getName)) {
+    # Get title - manual title takes priority, then getName, then generate on the fly
+    plot_title <- if (!is.null(title)) {
+      title
+    } else if (!is.null(runs$Model$getName)) {
       runs$Model$getName
     } else {
       # Generate name on the fly if not set
@@ -112,7 +115,7 @@ getSpecTime.PhyloSim <- function(runs, thinning_factor = NULL, ymax = NULL, plot
     
     plot(result$year, result$spec_rich, type = "l", ylab = "richness", xlab = "generation",
          ylim = if (!is.null(ymax)) c(0, ymax) else c(0, max(result$spec_rich)),
-         main = title)
+         main = plot_title)
   }
   
   return(result)
@@ -120,8 +123,24 @@ getSpecTime.PhyloSim <- function(runs, thinning_factor = NULL, ymax = NULL, plot
 #' @rdname getSpecTime
 #' @method getSpecTime PhylosimList
 #' @export
-getSpecTime.PhylosimList <- function(runs, thinning_factor = NULL, ymax = NULL, plot = TRUE) {
-  results <- lapply(runs, getSpecTime, thinning_factor = thinning_factor, ymax = ymax, plot = plot)
+getSpecTime.PhylosimList <- function(runs, thinning_factor = NULL, ymax = NULL, plot = TRUE, title = NULL) {
+  # Handle title argument for list case
+  if (!is.null(title)) {
+    if (length(title) == 1) {
+      # Single title provided - replicate for all runs
+      title <- rep(title, length(runs))
+    } else if (length(title) != length(runs)) {
+      warning("Length of title vector does not match length of runs. Using automatic titles.")
+      title <- NULL
+    }
+  }
+  
+  results <- lapply(seq_along(runs), function(i) {
+    current_title <- if (!is.null(title)) title[i] else NULL
+    getSpecTime(runs[[i]], thinning_factor = thinning_factor, ymax = ymax, 
+                plot = plot, title = current_title)
+  })
+  
   names(results) <- names(runs)
   return(results)
 }
