@@ -97,7 +97,7 @@ Landscape(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool
   unsigned int simulationEnd, double specRate, int dispersalCutoff, int nDensCutoff, int pDensCutoff,
   unsigned int mortalityStrength, double envStrength, double nDDStrength, double pDDStrength, int fission,
   double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
-  std::vector<double> soilmat, double envNicheWidth, double nDDNicheWidth, double pDDNicheWidth);
+  std::vector<double> soilmat, double nDDNicheWidth, double pDDNicheWidth, double envNicheWidth);
   
   virtual ~Landscape();
   
@@ -128,9 +128,9 @@ public:
 
   GlobalEnvironment(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool env, bool mort, bool repro,
                     unsigned int runs, double specRate, int dispersalCutoff, int nDensCutoff, int pDensCutoff,
-                    unsigned int mortalityStrength, double envStrength, double nDDStrength, double pDDStrength,
+                    unsigned int mortalityStrength, double nDDStrength, double pDDStrength, double envStrength,
                     int fission, double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
-                    std::vector<double> soilmat, double envNicheWidth, double nDDNicheWidth, double pDDNicheWidth);
+                    std::vector<double> soilmat, double nDDNicheWidth, double pDDNicheWidth, double envNicheWidth);
 
   virtual ~GlobalEnvironment();
 
@@ -148,9 +148,9 @@ public:
 
   LocalEnvironment(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool env, bool mort, bool repro,
                    unsigned int runs, double specRate, int dispersalCutoff, int nDensCutoff, int pDensCutoff,
-                   unsigned int mortalityStrength, double envStrength, double nDDStrength, double pDDStrength,
+                   unsigned int mortalityStrength, double nDDStrength, double pDDStrength, double envStrength,
                    int fission, double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
-                   std::vector<double> soilmat, double envNicheWidth, double nDDNicheWidth, double pDDNicheWidth);
+                   std::vector<double> soilmat, double nDDNicheWidth, double pDDNicheWidth, double envNicheWidth);
 
   virtual ~LocalEnvironment();
 

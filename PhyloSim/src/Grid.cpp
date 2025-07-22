@@ -78,9 +78,9 @@
 
 Landscape::Landscape(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool env, bool mort, bool repro,
                      unsigned int runs, double specRate, int dispersalCutoff, int nDensCutoff, int pDensCutoff,
-                     unsigned int mortalityStrength, double envStrength, double nDDStrength, double pDDStrength,
+                     unsigned int mortalityStrength, double nDDStrength, double pDDStrength, double envStrength,
                      int fission, double redQueen, double redQueenStrength, int protracted, std::vector<double> airmat,
-                     std::vector<double> soilmat, double envNicheWidth, double nDDNicheWidth, double pDDNicheWidth) {
+                     std::vector<double> soilmat, double nDDNicheWidth, double pDDNicheWidth, double envNicheWidth) {
 
   m_Cutoff = dispersalCutoff;
   m_Neutral = neutral;
@@ -185,12 +185,14 @@ Landscape::Landscape(int xsize, int ysize, int type, bool neutral, bool ndd, boo
   }
   // END Set up Environment
 
-  // Grid Geometry calculations
+  // Grid Geometry calculations (excluding focal cell)
   cellsWithin_N_DensCutoff = 0.0;
 
   for (int i = -m_nDensCutoff; i <= m_nDensCutoff; i++) {
     int yLim = floor(sqrt(m_nDensCutoff * m_nDensCutoff - i * i)); // avoid diagonal bias
     for (int j = -yLim; j <= yLim; j++) {
+      if (i == 0 && j == 0)
+        continue; // skip focal cell
       cellsWithin_N_DensCutoff += 1.0;
     }
   }
@@ -200,17 +202,18 @@ Landscape::Landscape(int xsize, int ysize, int type, bool neutral, bool ndd, boo
   for (int i = -m_pDensCutoff; i <= m_pDensCutoff; i++) {
     int yLim = floor(sqrt(m_pDensCutoff * m_pDensCutoff - i * i)); // avoid diagonal bias
     for (int j = -yLim; j <= yLim; j++) {
+      if (i == 0 && j == 0)
+        continue; // skip focal cell
       cellsWithin_P_DensCutoff += 1.0;
     }
   }
-  // END Grid Geometry calculations
 }
 
 Landscape::~Landscape() {
   for (int i = 0; i < m_Xdimensions; i++) {
     for (int j = 0; j < m_Ydimensions; j++) {
-      // TODO: FH 20.4.17 : I had suspected that the individuals need to
-      // be deleted here, but on reflection this seems fine?
+      // TODO: FH 20.4.17 : I had suspected that the individuals need to be deleted here, but on reflection this seems
+      // fine?
       // delete &m_Individuals[i][j]; // delete stored pointer
     }
     delete[] m_Individuals[i];
@@ -225,7 +228,7 @@ void Landscape::reproduce(unsigned int generation) {
 }
 
 std::pair<int, int> Landscape::get_dimensions() {
-  std::pair<int, int>dimensions;
+  std::pair<int, int> dimensions;
   dimensions = std::make_pair(m_Xdimensions, m_Ydimensions);
   return dimensions;
 }
@@ -258,13 +261,13 @@ void Landscape::moistChange(int sign, double magnitude) {
 GlobalEnvironment::GlobalEnvironment(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool env,
                                      bool mort, bool repro, unsigned int runs, double specRate, int dispersalCutoff,
                                      int nDensCutoff, int pDensCutoff, unsigned int mortalityStrength,
-                                     double envStrength, double nDDStrength, double pDDStrength, int fission,
+                                     double nDDStrength, double pDDStrength, double envStrength, int fission,
                                      double redQueen, double redQueenStrength, int protracted,
-                                     std::vector<double> airmat, std::vector<double> soilmat, double envNicheWidth,
-                                     double nDDNicheWidth, double pDDNicheWidth)
+                                     std::vector<double> airmat, std::vector<double> soilmat, double nDDNicheWidth,
+                                     double pDDNicheWidth, double envNicheWidth)
     : Landscape(xsize, ysize, type, neutral, ndd, pdd, env, mort, repro, runs, specRate, dispersalCutoff, nDensCutoff,
-                pDensCutoff, mortalityStrength, envStrength, nDDStrength, pDDStrength, fission, redQueen,
-                redQueenStrength, protracted, airmat, soilmat, envNicheWidth, nDDNicheWidth, pDDNicheWidth) {}
+                pDensCutoff, mortalityStrength, nDDStrength, pDDStrength, envStrength, fission, redQueen,
+                redQueenStrength, protracted, airmat, soilmat, nDDNicheWidth, pDDNicheWidth, envNicheWidth) {}
 
 GlobalEnvironment::~GlobalEnvironment() {}
 
@@ -396,7 +399,7 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
         // controls the intensity of the mechanisms
 
         // randomDouble(0,3) because fitness ranges from [0,3] with baseline 1. Hence baseline mortality = 1/3
-        double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 3.0); 
+        double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 3.0);
         // std::cout<<weight<<"\n"; // DEBUG
         if (fitness > chanceOfDeath) {
           continue;
@@ -482,9 +485,7 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
       //        }
       //      }
 
-      if (!m_reproduction && m_nDD)
-        densityUpdate(x_coordinate, y_coordinate);
-      if (!m_reproduction && m_pDD)
+      if (!m_reproduction && (m_nDD || m_pDD))
         densityUpdate(x_coordinate, y_coordinate);
 
       // only if env and dens affect reproduction
@@ -711,14 +712,14 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
 
 LocalEnvironment::LocalEnvironment(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool env,
                                    bool mort, bool repro, unsigned int runs, double specRate, int dispersalCutoff,
-                                   int nDensCutoff, int pDensCutoff, unsigned int mortalityStrength, double envStrength,
-                                   double nDDStrength, double pDDStrength, int fission, double redQueen,
+                                   int nDensCutoff, int pDensCutoff, unsigned int mortalityStrength, double nDDStrength,
+                                   double pDDStrength, double envStrength, int fission, double redQueen,
                                    double redQueenStrength, int protracted, std::vector<double> airmat,
-                                   std::vector<double> soilmat, double envNicheWidth, double nDDNicheWidth,
-                                   double pDDNicheWidth)
+                                   std::vector<double> soilmat, double nDDNicheWidth, double pDDNicheWidth,
+                                   double envNicheWidth)
     : Landscape(xsize, ysize, type, neutral, ndd, pdd, env, mort, repro, runs, specRate, dispersalCutoff, nDensCutoff,
-                pDensCutoff, mortalityStrength, envStrength, nDDStrength, pDDStrength, fission, redQueen,
-                redQueenStrength, protracted, airmat, soilmat, envNicheWidth, nDDNicheWidth, pDDNicheWidth) {}
+                pDensCutoff, mortalityStrength, nDDStrength, pDDStrength, envStrength, fission, redQueen,
+                redQueenStrength, protracted, airmat, soilmat, nDDNicheWidth, pDDNicheWidth, envNicheWidth) {}
 
 LocalEnvironment::~LocalEnvironment() {}
 
@@ -833,10 +834,9 @@ void LocalEnvironment::reproduce(unsigned int generation) {
 
     // UPDATE RELATEDNESS
 
-    if (m_nDD)
+    if (m_nDD || m_pDD)
       densityUpdate(x_coordinate, y_coordinate);
-    if (m_pDD)
-      densityUpdate(x_coordinate, y_coordinate);
+
   } // END while (numberDeath < numberOfRuns)
 }
 
@@ -858,7 +858,7 @@ double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cuto
 
       double a = m_Individuals[focus_x][focus_y].m_CompetitionMarker;
       double b = m_Individuals[neighborX][neighborY].m_CompetitionMarker;
-       // gauss kernel: closely related ind. have high impact, far relation minimal impact
+      // gauss kernel: closely related ind. have high impact, far relation minimal impact
       unrelatedness += exp(-0.5 * pow((a - b) / densityNicheWidth, 2.0));
     }
   }
@@ -868,14 +868,26 @@ double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cuto
 // Update density for both negative and positive density dependence
 
 void LocalEnvironment::densityUpdate(int x, int y) {
+
+  // DEBUG andy
+
+#ifdef DEBUG_ANDY
+  std::cout << "m_nDDNicheWidth: " << m_nDDNicheWidth << "\n";
+  std::cout << "m_pDDNicheWidth: " << m_pDDNicheWidth << "\n";
+#endif
+
   // Update negative density dependence
   for (int X = -m_nDensCutoff; X <= m_nDensCutoff; X++) {
     int yLims = floor(sqrt(m_nDensCutoff * m_nDensCutoff - X * X));
     for (int Y = -yLims; Y <= yLims; Y++) {
       int focus_x = ((x + X + m_Xdimensions) % m_Xdimensions);
       int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
-
       double nUnrelatedness = calculateRelatedness(focus_x, focus_y, m_nDensCutoff, m_nDDNicheWidth);
+
+#ifdef DEBUG_ANDY
+      std::cout << "negtive unrelatedness: " << nUnrelatedness << "  cells: " << cellsWithin_N_DensCutoff << "\n";
+#endif
+
       m_Individuals[focus_x][focus_y].m_nLocalDensity = nUnrelatedness / cellsWithin_N_DensCutoff;
     }
   }
@@ -888,7 +900,11 @@ void LocalEnvironment::densityUpdate(int x, int y) {
       int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
 
       double pUnrelatedness = calculateRelatedness(focus_x, focus_y, m_pDensCutoff, m_pDDNicheWidth);
-      // Assuming you have a separate field for positive density
+
+#ifdef DEBUG_ANDY
+      std::cout << "positive unrelatedness: " << pUnrelatedness << "  cells: " << cellsWithin_P_DensCutoff << "\n";
+#endif
+
       m_Individuals[focus_x][focus_y].m_pLocalDensity = pUnrelatedness / cellsWithin_P_DensCutoff;
     }
   }

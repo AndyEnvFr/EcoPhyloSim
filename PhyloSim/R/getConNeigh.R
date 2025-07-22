@@ -62,7 +62,7 @@ getConNeigh.PhyloSim <- function(simu) {
   
   simu <- getTorus(simu, overwrite = TRUE)
   
-  r <- simu$Model$densityCut
+  r <- max(simu$Model$pDensityCut,simu$Model$nDensityCut)
   offsets <- getCircularOffsets(r)
   
   lx <- nrow(simu$Output[[1]]$specMat)

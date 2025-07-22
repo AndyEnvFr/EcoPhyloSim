@@ -90,7 +90,7 @@ int main() {
   if (neutral && env)
     throw std::runtime_error("A neutral model can't be depending on the environment!");
 
-  std::string saveLoc = "C:/Users/Tankr_000/Documents/";
+  std::string saveLoc = "C:/Users/andre/Downloads/";
 
   // Running the model
 

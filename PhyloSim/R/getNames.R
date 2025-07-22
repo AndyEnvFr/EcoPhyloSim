@@ -2,7 +2,7 @@
 #'
 #' @title Generate simulation names for simulation objects
 #' @param runs Object of class \code{PhyloSim} or \code{PhylosimList}
-#' @return Character vector of names (length 1 for PhyloSim, or 1 per element for PhylosimList)
+#' @return For PhyloSim: the modified object with getName set. For PhylosimList: character vector of names.
 #' @description Constructs standardized names based on model parameters for consistent labeling.
 #' 
 #' See details for abbreviation rules.
@@ -23,10 +23,10 @@
 #' \dontrun{
 #' # For list of simulations
 #' names(my_PhyloSim_list) <- getNames(my_PhyloSim_list)
-#' my_PhyloSim_list[[1]]$Model$getName  # each object now stores its name
 #'
 #' # For single simulation
-#' my_simulation$Model$getName <- getNames(my_simulation)
+#' my_simulation <- getNames(my_simulation)  # Returns updated object
+#' my_simulation$Model$getName  # Now contains the name
 #' }
 #'
 #' @seealso \code{\link{PhyloSim}}
@@ -41,23 +41,30 @@ getNames <- function(runs) {
 getNames.PhyloSim <- function(runs) {
   m <- runs$Model
   name <- paste0(
+<<<<<<< HEAD
     if (isTRUE(m$negativeDensity)) paste0("nDD_Str", m$nDDStrength, "_",
                                           "Var", m$nDDNicheWidth, "_"),
     if (isTRUE(m$negativeDensity)) paste0("pDD_Str", m$pDDStrength, "_",
                                           "Var", m$pDDNicheWidth, "_"),
+=======
+    ifelse(isTRUE(m$positiveDensity), paste0("pdd", m$pDDStrength, "Var", m$pDDNicheWidth, "Cut", m$pDensityCut, "_"), "pdd0_"),
+    ifelse(isTRUE(m$negativeDensity), paste0("ndd", m$nDDStrength, "Var", m$nDDNicheWidth, "Cut", m$nDensityCut, "_"), "ndd0_"),
+>>>>>>> NewFunctions20250720
     "disp", ifelse(m$dispersal == "global", "G_", paste0(m$dispersal, "_")),
     "sr", m$specRate, "_",
     if (isTRUE(m$environment)) paste0("eStr", m$envStrength, "_",
                                       "eVar", m$envNicheWidth, "_"),
     "fbmr", m$fitnessBaseMortalityRatio, "_",
-    "dc", m$densityCut, "_",
     "fao", ifelse(m$fitnessActsOn == "mortality", "M", "R"),
     if (m$fission > 0) paste0("_fi", m$fission),
     if (m$redQueen > 0) paste0("_rq", m$redQueen),
     if (m$redQueenStrength > 0) paste0("_rqs", m$redQueenStrength),
     if (m$protracted > 0) paste0("_p", m$protracted)
   )
-  return(name)
+  
+  # Set the name in the object and return the modified object
+  runs$Model$getName <- name
+  return(runs)
 }
 
 #' @rdname getNames
@@ -65,14 +72,8 @@ getNames.PhyloSim <- function(runs) {
 #' @export
 getNames.PhylosimList <- function(runs) {
   names <- sapply(runs, function(x) {
-    name <- getNames(x)
-    x$Model$getName <- name
-    name
+    getNames.PhyloSim(x)$Model$getName
   })
-  
-  for (i in seq_along(runs)) {
-    runs[[i]]$Model$getName <- names[i]
-  }
   
   return(names)
 }

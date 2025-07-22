@@ -6,7 +6,7 @@
 \alias{getConNeigh.PhylosimList}
 \title{Get number of conspecific neighbors}
 \usage{
-getConNeigh(simu)
+getConNeigh(simulu)
 
 \method{getConNeigh}{PhyloSim}(simu)
 
