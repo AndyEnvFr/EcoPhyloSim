@@ -15,7 +15,7 @@ rac <- function(runs, which.result = NULL, plot_type = "line", title = NULL, yma
 #' @rdname rac
 #' @method rac PhyloSim
 #' @export
-rac.PhyloSim <- function(runs, which.result = NULL, plot_type = "line", title = NULL, ymax = NULL, xmax = NULL) {
+rac.PhyloSim <- function(runs, which.result = NULL, plot_type = "line", title = NULL, ymax = NULL, xmax = NULL, plot = TRUE, return_results = TRUE) {
   if (is.null(which.result)) which.result <- length(runs$Output)
   
   if (length(which.result) == 1 && which.result == "all") {
@@ -56,35 +56,44 @@ rac.PhyloSim <- function(runs, which.result = NULL, plot_type = "line", title = 
     getNames(runs)$Model$getName
   }
   
-  if (plot_type == "bar") {
-    barplot(RAC[[i]]$Abundance, log = "y", ylab = "Log Abundance", xlab = "Rank",
-            main = plot_title, names.arg = RAC[[i]]$Rank, ylim = c(1, ylim_max))
-  }
-  
-  if (plot_type == "line") {
-    if (length(simulations) == 1) {
-      plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type = "l", log = "y", ylab = "Log Abundance",
-           xlab = "Rank", main = plot_title, lwd = 2, xlim = c(0, xlim_max), ylim = c(1, ylim_max))
-    } else {
-      for (j in seq_along(simulations)) {  # Use j as counter
-        i <- simulations[j]  # i is the actual simulation number
-        if (j == 1) {  # Use j for first plot check
-          plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type = "l", log = "y", ylab = "Log Abundance",
-               xlab = "Rank", main = plot_title, col = cols[j], xlim = c(0, xlim_max), ylim = c(1, ylim_max))  # Use cols[j]
-        } else {
-          lines(RAC[[i]]$Rank, RAC[[i]]$Abundance, col = cols[j])  # Use cols[j]
+  if (plot){
+    if (plot_type == "bar") {
+      barplot(RAC[[i]]$Abundance, log = "y", ylab = "Log Abundance", xlab = "Rank",
+              main = plot_title, names.arg = RAC[[i]]$Rank, ylim = c(1, ylim_max))
+    }
+    
+    if (plot_type == "line") {
+      if (length(simulations) == 1) {
+        plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type = "l", log = "y", ylab = "Log Abundance",
+             xlab = "Rank", main = plot_title, lwd = 2, xlim = c(0, xlim_max), ylim = c(1, ylim_max))
+      } else {
+        for (j in seq_along(simulations)) {  # Use j as counter
+          i <- simulations[j]  # i is the actual simulation number
+          if (j == 1) {  # Use j for first plot check
+            plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type = "l", log = "y", ylab = "Log Abundance",
+                 xlab = "Rank", main = plot_title, col = cols[j], xlim = c(0, xlim_max), ylim = c(1, ylim_max))  # Use cols[j]
+          } else {
+            lines(RAC[[i]]$Rank, RAC[[i]]$Abundance, col = cols[j])  # Use cols[j]
+          }
         }
       }
     }
   }
   
-  if (length(simulations) == 1) return(RAC[[simulations]])
+  if (return_results){
+    if (length(simulations) == 1) {
+      return(RAC[[simulations]])
+    } else {
+      # Return the list of RAC data frames for multiple simulations
+      return(RAC[simulations])  # Only return the requested simulations
+    }
+  }
 }
 
 #' @rdname rac
 #' @method rac PhylosimList
 #' @export
-rac.PhylosimList <- function(runs, which.result = NULL, plot_type = "line", title = NULL, ymax = NULL, xmax = NULL) {
+rac.PhylosimList <- function(runs, which.result = NULL, plot_type = "line", title = NULL, ymax = NULL, xmax = NULL, plot = TRUE, return_results = TRUE) {
   if (!is.null(title) && length(title) != length(runs)) {
     warning("Length of title vector does not match length of runs. Using automatic titles.")
     title <- NULL
