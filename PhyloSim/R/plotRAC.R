@@ -18,7 +18,7 @@ rac <- function(runs, which.result = NULL, plot_type = "line", title = NULL, yma
 rac.PhyloSim <- function(runs, which.result = NULL, plot_type = "line", title = NULL, ymax = NULL, xmax = NULL) {
   if (is.null(which.result)) which.result <- length(runs$Output)
   
-  if (which.result == "all") {
+  if (length(which.result) == 1 && which.result == "all") {
     if (plot_type == "bar") stop("Argument 'bar' not possible for which.result='all'")
     simulations <- seq_along(runs$Output)
   } else {
@@ -66,12 +66,13 @@ rac.PhyloSim <- function(runs, which.result = NULL, plot_type = "line", title = 
       plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type = "l", log = "y", ylab = "Log Abundance",
            xlab = "Rank", main = plot_title, lwd = 2, xlim = c(0, xlim_max), ylim = c(1, ylim_max))
     } else {
-      for (i in simulations) {
-        if (i == simulations[1]) {
+      for (j in seq_along(simulations)) {  # Use j as counter
+        i <- simulations[j]  # i is the actual simulation number
+        if (j == 1) {  # Use j for first plot check
           plot(RAC[[i]]$Rank, RAC[[i]]$Abundance, type = "l", log = "y", ylab = "Log Abundance",
-               xlab = "Rank", main = plot_title, col = cols[i], xlim = c(0, xlim_max), ylim = c(1, ylim_max))
+               xlab = "Rank", main = plot_title, col = cols[j], xlim = c(0, xlim_max), ylim = c(1, ylim_max))  # Use cols[j]
         } else {
-          lines(RAC[[i]]$Rank, RAC[[i]]$Abundance, col = cols[i])
+          lines(RAC[[i]]$Rank, RAC[[i]]$Abundance, col = cols[j])  # Use cols[j]
         }
       }
     }
