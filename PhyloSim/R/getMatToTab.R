@@ -102,8 +102,20 @@ getMatToTab.PhyloSim <- function(simu, detailedParams = FALSE) {
     
     # Add parameter columns
     if (detailedParams) {
+      
+      # Compute abundance per species
+      spec_vec <- as.vector(simu$Output[[cidx]]$specMat)
+      census_df <- data.frame(specId = spec_vec)
+      abund_df <- census_df %>%
+        dplyr::count(specId, name = "abund")
+      
+      # Match abundance to each individual
+      abund_lookup <- setNames(abund_df$abund, abund_df$specId)
+      abund_vec <- abund_lookup[as.character(spec_vec)]
+      
       param_data <- data.frame(
-        pDD = rep(ifelse(simu$Model$positiveDensity, simu$Model$pDDStrength, 0),n_rows),
+        abund = abund_vec,
+        pDD = rep(ifelse(simu$Model$positiveDensity, simu$Model$pDDStrength, 0), n_rows),
         nDD = rep(ifelse(simu$Model$negativeDensity, simu$Model$nDDStrength, 0), n_rows),
         pDDVar = rep(simu$Model$pDDNicheWidth, n_rows),
         nDDVar = rep(simu$Model$nDDNicheWidth, n_rows),
