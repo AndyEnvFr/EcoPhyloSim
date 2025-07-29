@@ -125,6 +125,9 @@ Landscape(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool
 class GlobalEnvironment : public Landscape {
 public:
   GlobalEnvironment();
+  
+  void densityUpdate(int x, int y) override;
+  double calculateRelatedness(int focus_x, int focus_y, int cutoff, double densityNicheWidth) override;
 
   GlobalEnvironment(int xsize, int ysize, int type, bool neutral, bool ndd, bool pdd, bool env, bool mort, bool repro,
                     unsigned int runs, double specRate, int dispersalCutoff, int nDensCutoff, int pDensCutoff,

@@ -271,6 +271,53 @@ GlobalEnvironment::GlobalEnvironment(int xsize, int ysize, int type, bool neutra
 
 GlobalEnvironment::~GlobalEnvironment() {}
 
+void GlobalEnvironment::densityUpdate(int x, int y) {
+  // Update negative density dependence
+  for (int X = -m_nDensCutoff; X <= m_nDensCutoff; X++) {
+    int yLims = floor(sqrt(m_nDensCutoff * m_nDensCutoff - X * X));
+    for (int Y = -yLims; Y <= yLims; Y++) {
+      int focus_x = ((x + X + m_Xdimensions) % m_Xdimensions);
+      int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
+      double nUnrelatedness = calculateRelatedness(focus_x, focus_y, m_nDensCutoff, m_nDDNicheWidth);
+      m_Individuals[focus_x][focus_y].m_nLocalDensity = nUnrelatedness / cellsWithin_N_DensCutoff;
+    }
+  }
+  
+  // Update positive density dependence
+  for (int X = -m_pDensCutoff; X <= m_pDensCutoff; X++) {
+    int yLims = floor(sqrt(m_pDensCutoff * m_pDensCutoff - X * X));
+    for (int Y = -yLims; Y <= yLims; Y++) {
+      int focus_x = ((x + X + m_Xdimensions) % m_Xdimensions);
+      int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
+      double pUnrelatedness = calculateRelatedness(focus_x, focus_y, m_pDensCutoff, m_pDDNicheWidth);
+      m_Individuals[focus_x][focus_y].m_pLocalDensity = pUnrelatedness / cellsWithin_P_DensCutoff;
+    }
+  }
+}
+
+double GlobalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cutoff, double densityNicheWidth) {
+  double unrelatedness = 0.0;
+  
+  for (int X = -cutoff; X <= cutoff; X++) {
+    int yLims = floor(sqrt(cutoff * cutoff - X * X)); // avoid diagonal bias
+    for (int Y = -yLims; Y <= yLims; Y++) {
+      int neighborX = ((focus_x + X + m_Xdimensions) % m_Xdimensions);
+      int neighborY = ((focus_y + Y + m_Ydimensions) % m_Ydimensions);
+      
+      // Skip self-comparison
+      if (neighborX == focus_x && neighborY == focus_y)
+        continue;
+      
+      double a = m_Individuals[focus_x][focus_y].m_CompetitionMarker;
+      double b = m_Individuals[neighborX][neighborY].m_CompetitionMarker;
+      // gauss kernel: closely related ind. have high impact, far relation minimal impact
+      unrelatedness += exp(-0.5 * pow((a - b) / densityNicheWidth, 2.0));
+    }
+  }
+  return unrelatedness;
+}
+
+
 void GlobalEnvironment::reproduce(unsigned int generation) {
 
   /////////////////////////////////////////////////////
@@ -381,6 +428,7 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
 
     // TODO - seems to me the next for loop is not yet corrected if
     // fitness goes on reproduction,
+    
 
     while (numberDeath < numberOfRuns) {
       event++;
@@ -414,11 +462,10 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
       if (m_reproduction) {
         new_parent = m_RandomGenerator.multinomialDraw(cumWeights, m_LandscapeSize - 1, seedSum);
       } else {
-        new_parent = m_RandomGenerator.randomInt(0, m_LandscapeSize - 1);
+        x_parent = m_RandomGenerator.randomInt(0, m_Xdimensions - 1);
+        y_parent = m_RandomGenerator.randomInt(0, m_Ydimensions - 1);
       }
 
-      x_parent = parents[new_parent].first;
-      y_parent = parents[new_parent].second;
 
       m_Individuals[x_coordinate][y_coordinate] = m_Individuals[x_parent][y_parent]; // overloaded operator, deep copy !
 
