@@ -63,9 +63,5 @@ getNames.PhyloSim <- function(runs) {
 #' @method getNames PhylosimList
 #' @export
 getNames.PhylosimList <- function(runs) {
-  names <- sapply(runs, function(x) {
-    getNames.PhyloSim(x)$Model$getName
-  })
-  
-  return(names)
+    return(500)
 }
