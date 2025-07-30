@@ -40,11 +40,11 @@
 #' \dontrun{
 #' # Apply to single runslation
 #' runs_with_neighbors <- getConNeigh(my_runslation)
-#' my_runslation$Model$getName <- getNames(my_runslation)
+#' my_runslation$Model$getName <- getParamNames(my_runslation)
 #' 
 #' # Apply to list of runslations
 #' runs_list_with_neighbors <- getConNeigh(my_runslation_list)
-#' names(runs_list_with_neighbors) <- getNames(runs_list_with_neighbors)
+#' names(runs_list_with_neighbors) <- getParamNames(runs_list_with_neighbors)
 #' runs_list_with_neighbors[[1]]$Model$getName
 #' }
 #' 
@@ -58,7 +58,7 @@ getConNeigh <- function(runs) {
 #' @export
 getConNeigh.PhyloSim <- function(runs) {
   # Add name to Model$getName for downstream tracking
-  runs$Model$getName <- getNames(runs)
+  runs <- getParamNames(runs)
   
   runs <- getTorus(runs, overwrite = TRUE)
   
@@ -103,6 +103,9 @@ getConNeigh.PhyloSim <- function(runs) {
 getConNeigh.PhylosimList <- function(runs){
   processed_list <- lapply(runs, getConNeigh)
   class(processed_list) <- "PhylosimList"
-  names(processed_list) <- getNames(processed_list)
+  names <- sapply(processed_list, function(x){
+    return(x$Model$getName)
+  })
+  names(processed_list) <- names
   return(processed_list)
 }

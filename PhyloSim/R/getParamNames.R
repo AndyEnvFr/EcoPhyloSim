@@ -65,6 +65,6 @@ getParamNames.PhyloSim <- function(runs) {
 #' @export
 getParamNames.PhylosimList <- function(runs) {
   res <- lapply(runs, getParamNames.PhyloSim)
+  class(res) <- "PhylosimList"
   return(res)
 }
-
