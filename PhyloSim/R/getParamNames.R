@@ -22,23 +22,23 @@
 #' @examples
 #' \dontrun{
 #' # For list of simulations
-#' names(my_PhyloSim_list) <- getNames(my_PhyloSim_list)
+#' names(my_PhyloSim_list) <- getParamNames(my_PhyloSim_list)
 #'
 #' # For single simulation
-#' my_simulation <- getNames(my_simulation)  # Returns updated object
+#' my_simulation <- getParamNames(my_simulation)  # Returns updated object
 #' my_simulation$Model$getName  # Now contains the name
 #' }
 #'
 #' @seealso \code{\link{PhyloSim}}
 #' @export
-getNames <- function(runs) {
-  UseMethod("getNames")
+getParamNames <- function(runs) {
+  UseMethod("getParamNames")
 }
 
-#' @rdname getNames
-#' @method getNames PhyloSim
+#' @rdname getParamNames
+#' @method getParamNames PhyloSim
 #' @export
-getNames.PhyloSim <- function(runs) {
+getParamNames.PhyloSim <- function(runs) {
   m <- runs$Model
   name <- paste0(
     ifelse(isTRUE(m$positiveDensity), paste0("pdd", m$pDDStrength, "Var", m$pDDNicheWidth, "Cut", m$pDensityCut, "_"), "pdd0_"),
@@ -60,16 +60,11 @@ getNames.PhyloSim <- function(runs) {
   return(runs)
 }
 
-#' @rdname getNames
-#' @method getNames PhylosimList
+#' @rdname getParamNames
+#' @method getParamNames PhylosimList
 #' @export
-# getNames.PhylosimList <- function(runs) {
-#   names <- sapply(runs, function(x) {
-#     getNames.PhyloSim(x)$Model$getName
-#   })
-#   
-#   return(names)
-# }
-getNames.PhylosimList <- function(runs) {
-  return(500)
+getParamNames.PhylosimList <- function(runs) {
+  res <- lapply(runs, getParamNames.PhyloSim)
+  return(res)
 }
+
