@@ -59,27 +59,18 @@ getNames.PhyloSim <- function(runs) {
 #' @rdname getNames
 #' @method getNames PhylosimList
 #' @export
-# getNames.PhylosimList <- function(runs) {
-#   names <- sapply(runs, function(x) {
-#     name <- getNames(x)
-#     x$Model$getName <- name
-#     name
-#   })
-#   
-#   for (i in seq_along(runs)) {
-#     runs[[i]]$Model$getName <- names[i]
-#   }
-#   
-#   return(names)
-# }
-
-# getNames.PhylosimList <- function(runs) {
-#   names <- sapply(runs, function(x) {
-#     getNames.PhyloSim(x)$Model$getName
-#   })
-#   
-#   return(names)
-# }
 getNames.PhylosimList <- function(runs) {
-  return(500)
+  names <- sapply(runs, function(x) {
+    name <- getNames(x)
+    x$Model$getName <- name
+    name
+  })
+
+  for (i in seq_along(runs)) {
+    runs[[i]]$Model$getName <- names[i]
+  }
+
+  return(names)
 }
+
+
