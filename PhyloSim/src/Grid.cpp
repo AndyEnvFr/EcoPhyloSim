@@ -462,10 +462,11 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
       if (m_reproduction) {
         new_parent = m_RandomGenerator.multinomialDraw(cumWeights, m_LandscapeSize - 1, seedSum);
       } else {
-        x_parent = m_RandomGenerator.randomInt(0, m_Xdimensions - 1);
-        y_parent = m_RandomGenerator.randomInt(0, m_Ydimensions - 1);
+        new_parent = m_RandomGenerator.randomInt(0, m_LandscapeSize - 1);
       }
-
+      
+      x_parent = parents[new_parent].first;
+      y_parent = parents[new_parent].second;
 
       m_Individuals[x_coordinate][y_coordinate] = m_Individuals[x_parent][y_parent]; // overloaded operator, deep copy !
 
