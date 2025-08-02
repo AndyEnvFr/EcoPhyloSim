@@ -22,6 +22,9 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <fstream>
+#include <sstream>
+
 
 #include "Grid.h"
 #include "Individual.h"
@@ -278,8 +281,8 @@ void GlobalEnvironment::densityUpdate(int x, int y) {
     for (int Y = -yLims; Y <= yLims; Y++) {
       int focus_x = ((x + X + m_Xdimensions) % m_Xdimensions);
       int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
-      double nUnrelatedness = calculateRelatedness(focus_x, focus_y, m_nDensCutoff, m_nDDNicheWidth);
-      m_Individuals[focus_x][focus_y].m_nLocalDensity = nUnrelatedness / cellsWithin_N_DensCutoff;
+      double nRelatedness = calculateRelatedness(focus_x, focus_y, m_nDensCutoff, m_nDDNicheWidth);
+      m_Individuals[focus_x][focus_y].m_nLocalDensity = nRelatedness / cellsWithin_N_DensCutoff;
     }
   }
   
@@ -289,14 +292,14 @@ void GlobalEnvironment::densityUpdate(int x, int y) {
     for (int Y = -yLims; Y <= yLims; Y++) {
       int focus_x = ((x + X + m_Xdimensions) % m_Xdimensions);
       int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
-      double pUnrelatedness = calculateRelatedness(focus_x, focus_y, m_pDensCutoff, m_pDDNicheWidth);
-      m_Individuals[focus_x][focus_y].m_pLocalDensity = pUnrelatedness / cellsWithin_P_DensCutoff;
+      double pRelatedness = calculateRelatedness(focus_x, focus_y, m_pDensCutoff, m_pDDNicheWidth);
+      m_Individuals[focus_x][focus_y].m_pLocalDensity = pRelatedness / cellsWithin_P_DensCutoff;
     }
   }
 }
 
 double GlobalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cutoff, double densityNicheWidth) {
-  double unrelatedness = 0.0;
+  double relatedness = 0.0;
   
   for (int X = -cutoff; X <= cutoff; X++) {
     int yLims = floor(sqrt(cutoff * cutoff - X * X)); // avoid diagonal bias
@@ -311,10 +314,10 @@ double GlobalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cut
       double a = m_Individuals[focus_x][focus_y].m_CompetitionMarker;
       double b = m_Individuals[neighborX][neighborY].m_CompetitionMarker;
       // gauss kernel: closely related ind. have high impact, far relation minimal impact
-      unrelatedness += exp(-0.5 * pow((a - b) / densityNicheWidth, 2.0));
+      relatedness += exp(-0.5 * pow((a - b) / densityNicheWidth, 2.0));
     }
   }
-  return unrelatedness;
+  return relatedness;
 }
 
 
@@ -815,9 +818,26 @@ void LocalEnvironment::reproduce(unsigned int generation) {
           m_Environment[x_coordinate * m_Ydimensions + y_coordinate].first, m_Env, m_nDD, m_pDD, generation,
           m_redQueenStrength, m_redQueen);
       double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 3.0);
+
+      // Calculate relatedness
+      double Nrelatedness = calculateRelatedness(x_coordinate, y_coordinate, m_nDensCutoff, m_nDDNicheWidth);
+      double Prelatedness = calculateRelatedness(x_coordinate, y_coordinate, m_pDensCutoff, m_pDDNicheWidth);
+      
+      // Create filename with niche widths
+      std::ostringstream filename;
+      filename << "fitness_mortality_N" << m_nDDNicheWidth << "_P" << m_pDDNicheWidth << ".txt";
+      
+      // Write all values in one line
+      std::ofstream file(filename.str(), std::ios::app);
+      if (file.is_open()) {
+        file << event << "\t" << weight << "\t" << chanceOfDeath << "\t" << Nrelatedness << "\t" << Prelatedness << "\n";
+        file.close();
+      }
+    
       if (weight > chanceOfDeath)
         continue;
     }
+    
 
     // If we continue, count up number of deaths and perform replacement
 
@@ -892,25 +912,35 @@ void LocalEnvironment::reproduce(unsigned int generation) {
 
 // helper function calculates generic relatedness
 double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cutoff, double densityNicheWidth) {
-  double unrelatedness = 0.0;
-
+  double relatedness = 0.0;
+  
+  // Calculate amplitude based on your R formula: amp = exp(-variance)
+  double amplitude = exp(-densityNicheWidth * 20);
+  
   for (int X = -cutoff; X <= cutoff; X++) {
     int yLims = floor(sqrt(cutoff * cutoff - X * X)); // avoid diagonal bias
     for (int Y = -yLims; Y <= yLims; Y++) {
       int neighborX = ((focus_x + X + m_Xdimensions) % m_Xdimensions);
       int neighborY = ((focus_y + Y + m_Ydimensions) % m_Ydimensions);
-
       // Skip self-comparison
       if (neighborX == focus_x && neighborY == focus_y)
         continue;
-
+      
       double a = m_Individuals[focus_x][focus_y].m_CompetitionMarker;
       double b = m_Individuals[neighborX][neighborY].m_CompetitionMarker;
-      // gauss kernel: closely related ind. have high impact, far relation minimal impact
-      unrelatedness += exp(-0.5 * pow((a - b) / densityNicheWidth, 2.0));
+      double difference = std::abs(a - b);
+      
+      relatedness += amplitude * exp(-0.5 * pow(difference / densityNicheWidth, 2.0));
+      
+      // Write all values in one line
+      std::ofstream file("differences.txt", std::ios::app);
+      if (file.is_open()) {
+        file << difference << "\n";
+        file.close();
+      }
     }
   }
-  return unrelatedness;
+  return relatedness;
 }
 
 // Update density for both negative and positive density dependence
@@ -930,13 +960,13 @@ void LocalEnvironment::densityUpdate(int x, int y) {
     for (int Y = -yLims; Y <= yLims; Y++) {
       int focus_x = ((x + X + m_Xdimensions) % m_Xdimensions);
       int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
-      double nUnrelatedness = calculateRelatedness(focus_x, focus_y, m_nDensCutoff, m_nDDNicheWidth);
+      double nRelatedness = calculateRelatedness(focus_x, focus_y, m_nDensCutoff, m_nDDNicheWidth);
 
 #ifdef DEBUG_ANDY
-      std::cout << "negtive unrelatedness: " << nUnrelatedness << "  cells: " << cellsWithin_N_DensCutoff << "\n";
+      std::cout << "negtive Relatedness: " << nRelatedness << "  cells: " << cellsWithin_N_DensCutoff << "\n";
 #endif
 
-      m_Individuals[focus_x][focus_y].m_nLocalDensity = nUnrelatedness / cellsWithin_N_DensCutoff;
+      m_Individuals[focus_x][focus_y].m_nLocalDensity = nRelatedness / cellsWithin_N_DensCutoff;
     }
   }
 
@@ -947,13 +977,13 @@ void LocalEnvironment::densityUpdate(int x, int y) {
       int focus_x = ((x + X + m_Xdimensions) % m_Xdimensions);
       int focus_y = ((y + Y + m_Ydimensions) % m_Ydimensions);
 
-      double pUnrelatedness = calculateRelatedness(focus_x, focus_y, m_pDensCutoff, m_pDDNicheWidth);
+      double pRelatedness = calculateRelatedness(focus_x, focus_y, m_pDensCutoff, m_pDDNicheWidth);
 
 #ifdef DEBUG_ANDY
-      std::cout << "positive unrelatedness: " << pUnrelatedness << "  cells: " << cellsWithin_P_DensCutoff << "\n";
+      std::cout << "positive Relatedness: " << pRelatedness << "  cells: " << cellsWithin_P_DensCutoff << "\n";
 #endif
 
-      m_Individuals[focus_x][focus_y].m_pLocalDensity = pUnrelatedness / cellsWithin_P_DensCutoff;
+      m_Individuals[focus_x][focus_y].m_pLocalDensity = pRelatedness / cellsWithin_P_DensCutoff;
     }
   }
 }
