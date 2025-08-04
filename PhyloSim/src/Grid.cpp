@@ -823,6 +823,7 @@ void LocalEnvironment::reproduce(unsigned int generation) {
       double Nrelatedness = calculateRelatedness(x_coordinate, y_coordinate, m_nDensCutoff, m_nDDNicheWidth);
       double Prelatedness = calculateRelatedness(x_coordinate, y_coordinate, m_pDensCutoff, m_pDDNicheWidth);
       
+#ifdef DEBUG_ANDY
       // Create filename with niche widths
       std::ostringstream filename;
       filename << "fitness_mortality_N" << m_nDDNicheWidth << "_P" << m_pDDNicheWidth << ".txt";
@@ -833,6 +834,7 @@ void LocalEnvironment::reproduce(unsigned int generation) {
         file << event << "\t" << weight << "\t" << chanceOfDeath << "\t" << Nrelatedness << "\t" << Prelatedness << "\n";
         file.close();
       }
+#endif
     
       if (weight > chanceOfDeath)
         continue;
@@ -915,7 +917,7 @@ double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cuto
   double relatedness = 0.0;
   
   // Calculate amplitude based on your R formula: amp = exp(-variance)
-  double amplitude = exp(-densityNicheWidth * 20);
+  double amplitude = exp(-densityNicheWidth * 100);
   
   for (int X = -cutoff; X <= cutoff; X++) {
     int yLims = floor(sqrt(cutoff * cutoff - X * X)); // avoid diagonal bias
@@ -932,12 +934,15 @@ double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cuto
       
       relatedness += amplitude * exp(-0.5 * pow(difference / densityNicheWidth, 2.0));
       
+#ifdef DEBUG_ANDY
       // Write all values in one line
       std::ofstream file("differences.txt", std::ios::app);
       if (file.is_open()) {
         file << difference << "\n";
         file.close();
       }
+#endif
+      
     }
   }
   return relatedness;
