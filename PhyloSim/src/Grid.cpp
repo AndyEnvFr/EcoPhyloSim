@@ -916,8 +916,8 @@ void LocalEnvironment::reproduce(unsigned int generation) {
 double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cutoff, double densityNicheWidth) {
   double relatedness = 0.0;
   
-  // Calculate amplitude based on your R formula: amp = exp(-variance)
-  double amplitude = exp(-densityNicheWidth * 100);
+  // Use densityNicheWidth directly as lambda parameter
+  double lambda = densityNicheWidth;
   
   for (int X = -cutoff; X <= cutoff; X++) {
     int yLims = floor(sqrt(cutoff * cutoff - X * X)); // avoid diagonal bias
@@ -932,7 +932,18 @@ double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cuto
       double b = m_Individuals[neighborX][neighborY].m_CompetitionMarker;
       double difference = std::abs(a - b);
       
-      relatedness += amplitude * exp(-0.5 * pow(difference / densityNicheWidth, 2.0));
+      // Exponential distribution kernel: f(x) = lambda * exp(-lambda * x)
+      // Normalized for interval [0, 1]: norm_factor * exp(-lambda * x)
+      // where norm_factor = lambda / (1 - exp(-lambda))
+      // Then divide by 20 to bound results between 0 and 1
+      // lambda is user-defined but can be max 20
+      
+      double norm_factor = lambda / (1 - exp(-lambda));
+      relatedness += (norm_factor * exp(-lambda * difference * 20)) / 20.0;
+      
+      // 5 because of the median magnitudes of the trait differences
+      // if 1 instad of 5, fitness boost of high Lambda > boost of low Lambda always, even for unrelated species
+      // with 5 for closely related high Lambda is better and for far rel. low Lambda
       
 #ifdef DEBUG_ANDY
       // Write all values in one line
@@ -947,7 +958,6 @@ double LocalEnvironment::calculateRelatedness(int focus_x, int focus_y, int cuto
   }
   return relatedness;
 }
-
 // Update density for both negative and positive density dependence
 
 void LocalEnvironment::densityUpdate(int x, int y) {
