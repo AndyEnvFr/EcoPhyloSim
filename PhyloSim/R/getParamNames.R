@@ -41,8 +41,10 @@ getParamNames <- function(runs) {
 getParamNames.PhyloSim <- function(runs) {
   m <- runs$Model
   name <- paste0(
-    ifelse(isTRUE(m$positiveDensity), paste0("pdd", m$pDDStrength, "Var", m$pDDNicheWidth, "Cut", m$pDensityCut, "_"), "pdd0_"),
-    ifelse(isTRUE(m$negativeDensity), paste0("ndd", m$nDDStrength, "Var", m$nDDNicheWidth, "Cut", m$nDensityCut, "_"), "ndd0_"),
+    ifelse(isTRUE(m$positiveDensity), paste0("pdd", m$pDDStrength, "Var", m$pDDNicheWidth, "Cut", m$pDensityCut, "_"),
+           "pdd0_", "Var", m$pDDNicheWidth, "Cut", m$pDensityCut, "_"),
+    ifelse(isTRUE(m$negativeDensity), paste0("ndd", m$nDDStrength, "Var", m$nDDNicheWidth, "Cut", m$nDensityCut, "_"),
+           "ndd0_", "Var", m$nDDNicheWidth, "Cut", m$nDensityCut, "_"),
     "disp", ifelse(m$dispersal == "global", "G_", paste0(m$dispersal, "_")),
     "sr", m$specRate, "_",
     if (isTRUE(m$environment)) paste0("eStr", m$envStrength, "_",
