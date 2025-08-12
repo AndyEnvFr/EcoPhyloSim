@@ -793,7 +793,7 @@ void LocalEnvironment::reproduce(unsigned int generation) {
   // if(m_mortality) numberOfRuns =  m_LandscapeSize*2;
   // else numberOfRuns =  m_LandscapeSize;
 
-  numberOfRuns = m_LandscapeSize;
+  numberOfRuns = m_LandscapeSize /3;
 
   // TODO
   // What todo?
