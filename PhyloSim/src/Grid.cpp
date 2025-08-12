@@ -424,7 +424,7 @@ void GlobalEnvironment::reproduce(unsigned int generation) {
     // else numberOfRuns = m_LandscapeSize;
     //  TODO could make numberofruns a parameter
 
-    numberOfRuns = m_LandscapeSize;
+    numberOfRuns = m_LandscapeSize / 3; // reduced base mortality 2025/08/12
 
     int event = 0;
     int numberDeath = 0;
