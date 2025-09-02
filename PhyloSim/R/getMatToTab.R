@@ -3,7 +3,7 @@
 #' @title Extract Matrices as Long-Format Table
 #' @param simu Object of class \code{PhyloSim} or \code{PhylosimList}
 #' @param detailedParams Logical. If \code{FALSE} (default), returns single \code{params} column.
-#' If \code{TRUE}, returns separate columns for each parameter.
+#' If \code{TRUE}, returns separate columns for each parameter (with selected fields trimmed for memory).
 #' @return A \code{data.frame} with census, individual ID, species ID, mortality status, 
 #' conspecific count, and simulation parameter label(s)
 #' @description Extracts key spatial matrices (ID, species, mortality, conspecific neighborhood) 
@@ -22,21 +22,14 @@
 #' }
 #'
 #' @details
-#' The input must be preprocessed using \code{\link{getConNeigh}}, which computes and
-#' assigns the required matrices (\code{idMat}, \code{mortMat}, \code{conNeighMat}).
-#' 
-#' Note: All values except mortality refer to the current generation. Mortality status
-#' is pulled from the subsequent generation.
-#'
-#' When \code{detailedParams = TRUE}, individual parameter columns are extracted from the
-#' simulation object and added to the output table.
+#' The input must be preprocessed using \code{\link{getConNeigh}}.
+#' Note: All values except mortality refer to the current generation. Mortality is from the next generation.
 #'
 #' @seealso \code{\link{getConNeigh}}, \code{\link{getMortality}}, \code{\link{getID}}, \code{\link{getTorus}}
 #' @export
 getMatToTab <- function(simu, detailedParams = FALSE) {
   UseMethod("getMatToTab")
 }
-
 
 #' @rdname getMatToTab
 #' @method getMatToTab PhyloSim
@@ -47,13 +40,13 @@ getMatToTab.PhyloSim <- function(simu, detailedParams = FALSE) {
   }
   
   census <- names(simu$Output)
-  genN <- length(census)
-  dimInner <- dim(simu$Output[[1]]$specMat)
+  genN   <- length(census)
+  dimInner  <- dim(simu$Output[[1]]$specMat)
   paramName <- simu$Model$getName
   
-  # Base columns
+  # Base columns (prealloc types)
   base_cols <- data.frame(
-    census = character(),
+    census = integer(),
     indId = integer(),
     specId = integer(),
     mortNextGen = logical(),
@@ -61,24 +54,23 @@ getMatToTab.PhyloSim <- function(simu, detailedParams = FALSE) {
     stringsAsFactors = FALSE
   )
   
-  # Add parameter columns based on detailedParams flag
   if (detailedParams) {
-    # Extract individual parameter values
+    # Trimmed parameter set to save memory (commented-out fields)
     param_cols <- data.frame(
-      pDD = numeric(),
-      nDD = numeric(),
-      pDDVar = numeric(),
-      nDDVar = numeric(),
-      pDC = numeric(),
-      nDC = numeric(),
-      disp = numeric(),
-      fao = character(),
-      fbmr = numeric(),
-      sr = numeric(),
+      abund = integer(),
+      pDD   = numeric(),
+      nDD   = numeric(),
+      pDDVar= numeric(),
+      nDDVar= numeric(),
+      pDC   = numeric(),
+      nDC   = numeric(),
+      # disp = numeric(),
+      # fao  = character(),
+      # fbmr = numeric(),
+      # sr   = numeric(),
       stringsAsFactors = FALSE
     )
   } else {
-    # Single params column
     param_cols <- data.frame(
       params = character(),
       stringsAsFactors = FALSE
@@ -91,36 +83,33 @@ getMatToTab.PhyloSim <- function(simu, detailedParams = FALSE) {
     cen <- census[cidx]
     n_rows <- dimInner[1] * dimInner[2]
     
-    # Base data
     interim <- data.frame(
-      census = as.numeric(rep(cen, n_rows)),
-      indId = as.vector(simu$Output[[cidx]]$idMat),
+      census = as.integer(rep(cen, n_rows)),
+      indId  = as.vector(simu$Output[[cidx]]$idMat),
       specId = as.vector(simu$Output[[cidx]]$specMat),
       mortNextGen = as.vector(simu$Output[[cidx + 1]]$mortMat),
-      con = as.vector(simu$Output[[cidx]]$conNeighMat),
+      con    = as.vector(simu$Output[[cidx]]$conNeighMat),
       stringsAsFactors = FALSE
     )
     
-    # Add parameter columns
     if (detailedParams) {
-      
-      # Compute abundance per species using base R
-      spec_vec <- as.vector(simu$Output[[cidx]]$specMat)
-      abund_table <- table(spec_vec)
-      abund_lookup <- as.numeric(abund_table[as.character(spec_vec)])
+      # abundance per cell (species frequency)
+      spec_vec <- interim$specId
+      abund_table  <- table(spec_vec)
+      abund_lookup <- as.integer(abund_table[as.character(spec_vec)])
       
       param_data <- data.frame(
         abund = abund_lookup,
-        pDD = rep(ifelse(simu$Model$positiveDensity, simu$Model$pDDStrength, 0), n_rows),
-        nDD = rep(ifelse(simu$Model$negativeDensity, simu$Model$nDDStrength, 0), n_rows),
-        pDDVar = rep(simu$Model$pDDNicheWidth, n_rows),
-        nDDVar = rep(simu$Model$nDDNicheWidth, n_rows),
-        pDC = rep(simu$Model$pDensityCut, n_rows),
-        nDC = rep(simu$Model$nDensityCut, n_rows),
-        disp = rep(simu$Model$dispersal, n_rows),
-        fao = rep(simu$Model$fitnessActsOn, n_rows),
-        fbmr = rep(simu$Model$fitnessBaseMortalityRatio, n_rows),
-        sr = rep(simu$Model$specRate, n_rows),
+        pDD   = rep(ifelse(simu$Model$positiveDensity, simu$Model$pDDStrength, 0), n_rows),
+        nDD   = rep(ifelse(simu$Model$negativeDensity, simu$Model$nDDStrength, 0), n_rows),
+        pDDVar= rep(simu$Model$pDDNicheWidth,  n_rows),
+        nDDVar= rep(simu$Model$nDDNicheWidth,  n_rows),
+        pDC   = rep(simu$Model$pDensityCut,    n_rows),
+        nDC   = rep(simu$Model$nDensityCut,    n_rows),
+        # disp = rep(simu$Model$dispersal,                 n_rows),
+        # fao  = rep(simu$Model$fitnessActsOn,             n_rows),
+        # fbmr = rep(simu$Model$fitnessBaseMortalityRatio, n_rows),
+        # sr   = rep(simu$Model$specRate,                  n_rows),
         stringsAsFactors = FALSE
       )
     } else {
@@ -130,9 +119,11 @@ getMatToTab.PhyloSim <- function(simu, detailedParams = FALSE) {
       )
     }
     
-    interim <- cbind(interim, param_data)
-    result <- rbind(result, interim)
+    result <- rbind(result, cbind(interim, param_data))
   }
+  
+  # Filter: keep even censuses only
+  result <- dplyr::filter(result, census %% 2 == 0)
   
   return(result)
 }

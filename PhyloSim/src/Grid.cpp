@@ -819,11 +819,11 @@ void LocalEnvironment::reproduce(unsigned int generation) {
           m_redQueenStrength, m_redQueen);
       double chanceOfDeath = m_RandomGenerator.randomDouble(0.0, 3.0);
 
+#ifdef DEBUG_ANDY
       // Calculate relatedness
       double Nrelatedness = calculateRelatedness(x_coordinate, y_coordinate, m_nDensCutoff, m_nDDNicheWidth);
       double Prelatedness = calculateRelatedness(x_coordinate, y_coordinate, m_pDensCutoff, m_pDDNicheWidth);
       
-#ifdef DEBUG_ANDY
       // Create filename with niche widths
       std::ostringstream filename;
       filename << "fitness_mortality_N" << m_nDDNicheWidth << "_P" << m_pDDNicheWidth << ".txt";
