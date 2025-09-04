@@ -49,20 +49,20 @@
 #' }
 #' 
 #' @export
-getConNeigh <- function(runs) {
+getConNeigh <- function(runs, radius = NULL) {
   UseMethod("getConNeigh")
 }
-
 #' @rdname getConNeigh
 #' @method getConNeigh PhyloSim
 #' @export
-getConNeigh.PhyloSim <- function(runs) {
+getConNeigh.PhyloSim <- function(runs, radius = NULL) {
   # Add name to Model$getName for downstream tracking
   runs <- getParamNames(runs)
+
+  r <- if (is.null(radius)) max(runs$Model$pDensityCut,runs$Model$nDensityCut) else radius # by default take density cut as the radius
   
-  runs <- getTorus(runs, overwrite = TRUE)
+  runs <- getTorus(runs, overwrite = TRUE, radius = r)
   
-  r <- max(runs$Model$pDensityCut,runs$Model$nDensityCut)
   offsets <- getCircularOffsets(r)
   
   lx <- nrow(runs$Output[[1]]$specMat)
@@ -96,12 +96,11 @@ getConNeigh.PhyloSim <- function(runs) {
   
   return(runs)
 }
-
 #' @rdname getConNeigh
 #' @method getConNeigh PhylosimList
 #' @export
-getConNeigh.PhylosimList <- function(runs){
-  processed_list <- lapply(runs, getConNeigh)
+getConNeigh.PhylosimList <- function(runs, radius = NULL){
+  processed_list <- lapply(runs, getConNeigh, radius = radius)
   class(processed_list) <- "PhylosimList"
   names <- sapply(processed_list, function(x){
     return(x$Model$getName)
