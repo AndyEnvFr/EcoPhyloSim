@@ -7,6 +7,12 @@
 #' differs, the individual is considered dead. First generation gets NA. Generation
 #' names are set using \code{Model$runs}.
 #'
+#' Only the recorded generations (\code{runs} in \code{\link{createCompletePar}})
+#' are compared, so \code{TRUE} means that the individual in this cell was replaced
+#' at least once since the previous recorded generation, not that it died in the
+#' last generation.
+#'
+#' @example /inst/examples/getConNeigh-help.R
 #' @export
 getMortality <- function(simu) {
   UseMethod("getMortality")
@@ -19,13 +25,11 @@ getMortality.PhyloSim <- function(simu) {
   names(simu$Output) <- as.character(simu$Model$runs) # adds generation names in the list
   
   for (i in seq_along(simu$Output)) {
-    simu$Output[[i]]$mortMat <- matrix(NA, nrow = simu$Model$x, ncol = simu$Model$y)
+    simu$Output[[i]]$mortMat <- matrix(NA, nrow(simu$Output[[i]]$traitMat), ncol(simu$Output[[i]]$traitMat))
   }
   
-  for (i in 1:(length(simu$Output) - 1)) {
-    current <- simu$Output[[i]]$traitMat # mortality based on trait values
-    nex <- simu$Output[[i + 1]]$traitMat
-    simu$Output[[i + 1]]$mortMat <- ifelse(current != nex, TRUE, FALSE)
+  for (i in seq_along(simu$Output)[-1]) { # mortality based on trait values
+    simu$Output[[i]]$mortMat <- simu$Output[[i - 1]]$traitMat != simu$Output[[i]]$traitMat
   }
   
   return(simu)

@@ -34,32 +34,25 @@ for all cells within the specified radius distance from each focal cell.
 \details{
 Calculate conspecific neighborhood matrices
 
-The function operates by:
-\enumerate{
-\item Expanding all matrices to torus topology (periodic boundary conditions)
-\item For each generation, counting conspecific neighbors using circular offsets
-\item Cropping all matrices back to original dimensions
-\item Preparing missing \code{idMat} and \code{mortMat} by calling
-\code{getID} and \code{getMortality} functions if needed
-}
-
-The torus expansion ensures that edge effects are minimized by treating
-the simulation grid as if it wraps around at the boundaries. After
-neighborhood calculations are complete, all matrices are automatically
-cropped back to their original dimensions.
+The simulation grid is treated as a torus (periodic boundaries), as in
+the C++ simulation. If \code{mortMat} or \code{idMat} are missing, they are
+added with \code{\link{getMortality}} and \code{\link{getID}}, as needed by
+\code{\link{getMatToTab}}. The parameter name from \code{\link{getNames}}
+is stored in \code{Model$getName}.
 }
 \examples{
-\dontrun{
-# Apply to single simulation
-simu_with_neighbors <- getConNeigh(my_simulation)
-my_simulation$Model$getName <- getNames(my_simulation)
+## Small simulation with four recorded generations
+par <- createCompletePar(x = 20, y = 20, dispersal = 1, runs = c(10, 20, 30, 40),
+                         density = 1, densityCut = 2, scenario = "example")
+simu <- runSimulation(par)
 
-# Apply to list of simulations
-simu_list_with_neighbors <- getConNeigh(my_simulation_list)
-names(simu_list_with_neighbors) <- getNames(simu_list_with_neighbors)
-simu_list_with_neighbors[[1]]$Model$getName
-}
+getNames(simu)                  # parameter label of the run
+getSpecTime(simu)               # species richness of each recorded generation
 
+simu <- getMortality(simu)      # adds mortMat: replaced since previous recorded generation?
+simu <- getID(simu)             # adds idMat: individual IDs across generations
+simu <- getConNeigh(simu)       # adds conNeighMat: number of conspecific neighbours
+head(getMatToTab(simu))         # long table for statistical analysis
 }
 \seealso{
 \code{\link{getCircularOffsets}} for the neighborhood definition used

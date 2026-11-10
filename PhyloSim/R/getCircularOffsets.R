@@ -2,7 +2,7 @@
 #'
 #' @title Compute coordinate offsets for circular neighborhoods
 #' @param radius Numeric value specifying the radius of the circular neighborhood. 
-#'   Must be a positive number. The actual neighborhood will include all integer 
+#'   Must be a non-negative integer. The actual neighborhood will include all integer 
 #'   coordinate pairs (dx, dy) where sqrt(dx² + dy²) ≤ radius.
 #' @return A data frame with two integer columns:
 #'   \describe{
@@ -28,17 +28,13 @@
 #' the circular boundary using the Pythagorean theorem: y_max = sqrt(radius² - x²).
 #' 
 #' @examples
-#' # Small neighborhood (8 adjacent cells)
+#' # Small neighborhood (4 direct neighbours, no diagonals)
 #' getCircularOffsets(1)
 #' #>   dx dy
-#' #> 1 -1 -1
-#' #> 2 -1  0
-#' #> 3 -1  1
-#' #> 4  0 -1
-#' #> 5  0  1
-#' #> 6  1 -1
-#' #> 7  1  0
-#' #> 8  1  1
+#' #> 1 -1  0
+#' #> 2  0 -1
+#' #> 3  0  1
+#' #> 4  1  0
 #' 
 #' # Larger circular neighborhood
 #' offsets_r3 <- getCircularOffsets(3)

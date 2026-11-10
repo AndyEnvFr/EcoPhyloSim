@@ -25,7 +25,8 @@
 #' Note: All values except mortality refer to the current generation. Mortality status
 #' is pulled from the subsequent generation.
 #'
-#' @seealso \code{\link{getConNeigh}}, \code{\link{getMortality}}, \code{\link{getID}}, \code{\link{getTorus}}
+#' @seealso \code{\link{getConNeigh}}, \code{\link{getMortality}}, \code{\link{getID}}
+#' @example /inst/examples/getConNeigh-help.R
 #' @export
 getMatToTab <- function(simu) {
   UseMethod("getMatToTab")

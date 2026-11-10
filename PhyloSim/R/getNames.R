@@ -19,15 +19,7 @@
 #'   \item \code{fiX}, \code{rqX}, \code{rqsX}, \code{pX}: Optional parameters if > 0
 #' }
 #'
-#' @examples
-#' \dontrun{
-#' # For list of simulations
-#' names(my_PhyloSim_list) <- getNames(my_PhyloSim_list)
-#' my_PhyloSim_list[[1]]$Model$getName  # each object now stores its name
-#'
-#' # For single simulation
-#' my_simulation$Model$getName <- getNames(my_simulation)
-#' }
+#' @example /inst/examples/getConNeigh-help.R
 #'
 #' @seealso \code{\link{PhyloSim}}
 #' @export
@@ -48,10 +40,10 @@ getNames.PhyloSim <- function(runs) {
     "fbmr", m$fitnessBaseMortalityRatio, "_",
     "dc", m$densityCut, "_",
     "fao", ifelse(m$fitnessActsOn == "mortality", "M", "R"),
-    if (m$fission > 0) paste0("_fi", m$fission),
-    if (m$redQueen > 0) paste0("_rq", m$redQueen),
-    if (m$redQueenStrength > 0) paste0("_rqs", m$redQueenStrength),
-    if (m$protracted > 0) paste0("_p", m$protracted)
+    if (isTRUE(m[["fission"]] > 0)) paste0("_fi", m$fission),
+    if (isTRUE(m[["redQueen"]] > 0)) paste0("_rq", m$redQueen),
+    if (isTRUE(m[["redQueenStrength"]] > 0)) paste0("_rqs", m$redQueenStrength),
+    if (isTRUE(m[["protracted"]] > 0)) paste0("_p", m$protracted)
   )
   return(name)
 }
@@ -60,17 +52,7 @@ getNames.PhyloSim <- function(runs) {
 #' @method getNames PhylosimList
 #' @export
 getNames.PhylosimList <- function(runs) {
-  names <- sapply(runs, function(x) {
-    name <- getNames(x)
-    x$Model$getName <- name
-    name
-  })
-
-  for (i in seq_along(runs)) {
-    runs[[i]]$Model$getName <- names[i]
-  }
-
-  return(names)
+  sapply(runs, getNames)
 }
 
 

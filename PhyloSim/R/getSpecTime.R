@@ -9,6 +9,7 @@
 #' @description Computes species richness per generation using \code{PhyloSim::specRich()}.
 #' Can be visualized or just returned. Richness values can optionally be thinned.
 #'
+#' @example /inst/examples/getConNeigh-help.R
 #' @export
 getSpecTime <- function(runs, thinning_factor = NULL, ymax = NULL, plot = TRUE) {
   UseMethod("getSpecTime")

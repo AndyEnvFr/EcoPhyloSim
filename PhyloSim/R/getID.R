@@ -6,6 +6,7 @@
 #' @description Each individual gets a persistent ID. IDs are unique per run.
 #' If the trait stays the same between generations, the ID persists. Otherwise, a new one is assigned.
 #'
+#' @example /inst/examples/getConNeigh-help.R
 #' @export
 getID <- function(simu) {
   UseMethod("getID")
@@ -21,12 +22,12 @@ getID.PhyloSim <- function(simu) {
   ids <- lapply(seq_along(simu$Output), function(i) (1:rXc) + i * rXc)
   
   for (i in seq_along(simu$Output)) {
-    simu$Output[[i]]$idMat <- matrix(NA, simu$Model$x, simu$Model$y)
+    simu$Output[[i]]$idMat <- matrix(NA, nrow(simu$Output[[i]]$traitMat), ncol(simu$Output[[i]]$traitMat))
   }
   
   simu$Output[[1]]$idMat[] <- 1:rXc
   
-  for (i in 2:length(simu$Output)) {
+  for (i in seq_along(simu$Output)[-1]) {
     unchanged <- simu$Output[[i]]$traitMat == simu$Output[[i - 1]]$traitMat # ids are based on traits, like mortalities
     simu$Output[[i]]$idMat[unchanged] <- simu$Output[[i - 1]]$idMat[unchanged]
     simu$Output[[i]]$idMat[!unchanged] <- ids[[i]][!unchanged]
