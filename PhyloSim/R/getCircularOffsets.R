@@ -34,6 +34,7 @@
 #' 
 #' @export
 getCircularOffsets <- function(radius) {
+  if (length(radius) != 1 || is.na(radius) || radius < 0 || radius != round(radius)) stop("radius must be a single non-negative integer")
   offsets <- data.frame()
   
   for (dx in -radius:radius) {

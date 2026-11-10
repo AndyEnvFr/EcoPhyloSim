@@ -15,7 +15,7 @@
 #'   \item \code{eX}: Environment dependence with strength X
 #'   \item \code{fbmrX}: Fitness-based mortality ratio
 #'   \item \code{dcX}: Density cutoff
-#'   \item \code{faoX}: Fitness acts on (M = mortality, R = reproduction)
+#'   \item \code{faoX}: Fitness acts on (M = mortality, R = reproduction, B = both)
 #'   \item \code{fiX}, \code{rqX}, \code{rqsX}, \code{pX}: Optional parameters if > 0
 #' }
 #'
@@ -39,7 +39,7 @@ getNames.PhyloSim <- function(runs) {
     if (isTRUE(m$environment)) paste0("e", m$envStrength, "_"),
     "fbmr", m$fitnessBaseMortalityRatio, "_",
     "dc", m$densityCut, "_",
-    "fao", ifelse(m$fitnessActsOn == "mortality", "M", "R"),
+    "fao", switch(m$fitnessActsOn, mortality = "M", reproduction = "R", both = "B"),
     if (isTRUE(m[["fission"]] > 0)) paste0("_fi", m$fission),
     if (isTRUE(m[["redQueen"]] > 0)) paste0("_rq", m$redQueen),
     if (isTRUE(m[["redQueenStrength"]] > 0)) paste0("_rqs", m$redQueenStrength),

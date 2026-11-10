@@ -38,7 +38,8 @@ The simulation grid is treated as a torus (periodic boundaries), as in
 the C++ simulation. If \code{mortMat} or \code{idMat} are missing, they are
 added with \code{\link{getMortality}} and \code{\link{getID}}, as needed by
 \code{\link{getMatToTab}}. The parameter name from \code{\link{getNames}}
-is stored in \code{Model$getName}.
+is stored in \code{Model$getName}. For a \code{PhylosimList}, existing list
+names are kept; otherwise the list is named with \code{\link{getNames}}.
 }
 \examples{
 ## Small simulation with four recorded generations

@@ -3,7 +3,9 @@
 #' @title Extract Matrices as Long-Format Table
 #' @param simu Object of class \code{PhyloSim} or \code{PhylosimList}
 #' @return A \code{data.frame} with census, individual ID, species ID, mortality status, 
-#' conspecific count, and simulation parameter label (\code{params})
+#' conspecific count, and simulation parameter label (\code{params}). For a
+#' \code{PhylosimList}, an additional first column \code{run} gives the position
+#' of the simulation in the list, as \code{indId} is only unique within a run.
 #' @description Extracts key spatial matrices (ID, species, mortality, conspecific neighborhood) 
 #' from all available generations of a simulation object and converts them to a tabular format
 #' suitable for statistical analysis.
@@ -77,5 +79,9 @@ getMatToTab.PhyloSim <- function(simu) {
 #' @method getMatToTab PhylosimList
 #' @export
 getMatToTab.PhylosimList <- function(simu) {
-  do.call(rbind, lapply(simu, getMatToTab))
+  tabs <- lapply(seq_along(simu), function(i) {
+    tab <- getMatToTab(simu[[i]])
+    cbind(run = rep(i, nrow(tab)), tab)
+  })
+  do.call(rbind, tabs)
 }

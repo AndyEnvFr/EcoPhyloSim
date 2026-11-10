@@ -21,7 +21,8 @@
 #' the C++ simulation. If \code{mortMat} or \code{idMat} are missing, they are
 #' added with \code{\link{getMortality}} and \code{\link{getID}}, as needed by
 #' \code{\link{getMatToTab}}. The parameter name from \code{\link{getNames}}
-#' is stored in \code{Model$getName}.
+#' is stored in \code{Model$getName}. For a \code{PhylosimList}, existing list
+#' names are kept; otherwise the list is named with \code{\link{getNames}}.
 #' 
 #' @seealso 
 #' \code{\link{getCircularOffsets}} for the neighborhood definition used
@@ -66,6 +67,6 @@ getConNeigh.PhyloSim <- function(simu) {
 getConNeigh.PhylosimList <- function(simu){
   processed_list <- lapply(simu, getConNeigh)
   class(processed_list) <- "PhylosimList"
-  names(processed_list) <- getNames(processed_list)
+  if (is.null(names(simu))) names(processed_list) <- getNames(processed_list)
   return(processed_list)
 }

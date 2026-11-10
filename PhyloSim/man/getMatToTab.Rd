@@ -17,7 +17,9 @@ getMatToTab(simu)
 }
 \value{
 A \code{data.frame} with census, individual ID, species ID, mortality status,
-conspecific count, and simulation parameter label (\code{params})
+conspecific count, and simulation parameter label (\code{params}). For a
+\code{PhylosimList}, an additional first column \code{run} gives the position
+of the simulation in the list, as \code{indId} is only unique within a run.
 }
 \description{
 Extracts key spatial matrices (ID, species, mortality, conspecific neighborhood)

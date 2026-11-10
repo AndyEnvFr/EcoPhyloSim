@@ -33,7 +33,7 @@ Generate simulation names based on model parameters
 \item \code{eX}: Environment dependence with strength X
 \item \code{fbmrX}: Fitness-based mortality ratio
 \item \code{dcX}: Density cutoff
-\item \code{faoX}: Fitness acts on (M = mortality, R = reproduction)
+\item \code{faoX}: Fitness acts on (M = mortality, R = reproduction, B = both)
 \item \code{fiX}, \code{rqX}, \code{rqsX}, \code{pX}: Optional parameters if > 0
 }
 }

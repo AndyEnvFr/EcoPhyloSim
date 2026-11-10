@@ -9,6 +9,7 @@ test_that("getCircularOffsets matches the C++ neighbourhood", {
   expect_equal(nrow(getCircularOffsets(1)), 4)
   expect_equal(nrow(getCircularOffsets(3)), 28)
   expect_equal(nrow(getCircularOffsets(0)), 0)
+  expect_error(getCircularOffsets(1.5))
 })
 
 test_that("getTorusMatrix wraps around, also for r = 0 and r > size", {
@@ -17,7 +18,7 @@ test_that("getTorusMatrix wraps around, also for r = 0 and r > size", {
   big <- PhyloSim:::getTorusMatrix(m, 1)
   expect_identical(dim(big), c(4L, 5L))
   expect_identical(big[1, 1], m[2, 3])
-  expect_identical(dim(PhyloSim:::getTorusMatrix(m, 4)), c(10L, 11L))
+  expect_identical(PhyloSim:::getTorusMatrix(m, 4), m[rep(1:2, 5), c(3, rep(1:3, 3), 1)])
 })
 
 test_that("getConNeigh counts conspecific neighbours on the torus", {
@@ -38,9 +39,9 @@ test_that("getMortality, getID and getMatToTab are consistent", {
   res <- getConNeigh(simu)
   expect_identical(names(res$Output), c("10", "11", "12"))
   expect_true(all(is.na(res$Output[[1]]$mortMat)))
-  changed <- res$Output[[2]]$traitMat != res$Output[[1]]$traitMat
-  expect_identical(res$Output[[2]]$mortMat, changed)
+  changed <- res$Output[[2]]$mortMat
   expect_true(any(changed) && any(!changed))
+  expect_identical(changed, res$Output[[2]]$neutMat != res$Output[[1]]$neutMat) # neutral marker also changes at birth
   expect_equal(res$Output[[2]]$idMat[!changed], res$Output[[1]]$idMat[!changed])
   expect_false(any(res$Output[[2]]$idMat[changed] %in% res$Output[[1]]$idMat))
   tab <- getMatToTab(res)
@@ -58,7 +59,11 @@ test_that("functions work with one recorded generation and with lists", {
   lst <- createPhylosimList(list(simu, one))
   expect_length(getNames(lst), 2)
   expect_s3_class(getConNeigh(lst), "PhylosimList")
-  expect_length(getSpecTime(lst), 2)
+  expect_identical(names(getConNeigh(createPhylosimList(list(a = simu, b = one)))), c("a", "b"))
+  expect_length(getSpecTime(lst, plot = FALSE), 2)
+  tab <- getMatToTab(getConNeigh(createPhylosimList(list(simu, simu))))
+  expect_identical(unique(tab$run), 1:2)
+  expect_equal(nrow(tab), 2 * 2 * 300)
 })
 
 test_that("getNames works if optional parameters are missing", {
@@ -66,4 +71,6 @@ test_that("getNames works if optional parameters are missing", {
   s$Model$fission <- NULL
   s$Model$redQueen <- NULL
   expect_identical(getNames(s), getNames(simu))
+  s$Model$fitnessActsOn <- "both"
+  expect_match(getNames(s), "faoB")
 })
