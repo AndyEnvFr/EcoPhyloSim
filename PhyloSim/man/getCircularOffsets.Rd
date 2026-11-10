@@ -57,7 +57,6 @@ plot(offsets_r3$dx, offsets_r3$dy, asp = 1, pch = 16,
      main = "Circular neighborhood (radius = 3)",
      xlab = "dx", ylab = "dy")
 points(0, 0, pch = 4, col = "red", cex = 2)  # Center point
-
 }
 \seealso{
 \code{\link{expand.grid}} for generating rectangular neighborhoods
