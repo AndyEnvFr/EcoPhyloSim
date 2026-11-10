@@ -22,6 +22,7 @@
 * Speciation by fission (`fission = 1` or `2`) assigned the wrong individuals to the new species (#85).
 * `runSimulationBatch()`: `strip = "summaries"` was ignored without parallelization, and the results were not named after their scenarios (#106).
 * Installation from GitHub failed because `src/RcppExports.cpp` was missing (#102).
+* `createCompletePar()` and `runSimulation()`: a matrix passed as `airmat` was assigned to the wrong cells (and memory outside of it was read) if the grid is not square (`x != y`) (#122).
 
 ## Documentation
 
