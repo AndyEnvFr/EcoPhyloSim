@@ -26,7 +26,7 @@ par <- createCompletePar(x = 50, y = 50, dispersal = 1 , runs = 1000,
         protracted=0)
 
 # Run the model
-simut <- runSimulation(par)
+simu <- runSimulation(par)
 
 plot(simu)
 
