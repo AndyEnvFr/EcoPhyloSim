@@ -12,7 +12,7 @@ workspace/
 
 00check.log
 
-PhyloSim.so
+*.so
 PhyloSimManual-concordance.tex
 PhyloSimManual.bbl
 PhyloSim/vignettes/PhyloSimManual.blg

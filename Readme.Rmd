@@ -47,3 +47,7 @@ plot(simu)
 sac(simu, rep = 100, plot= TRUE)
 ```
 
+
+### Contributing
+
+Questions, bug reports and contributions are welcome. Please read the [contributing guidelines](CONTRIBUTING.md) before opening an issue or pull request, in particular the policy on AI-generated contributions (see also the [instructions for AI coding agents](AGENTS.md)).
