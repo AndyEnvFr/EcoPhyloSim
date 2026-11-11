@@ -27,7 +27,11 @@
 #'   absolute difference in this trait to the neighbors. The number of
 #'   conspecific neighbors \code{con} is therefore only a proxy. As the grid is
 #'   always full, the number of heterospecific neighbors is the number of cells
-#'   in the neighborhood minus \code{con}.
+#'   in the neighborhood minus \code{con}. With \code{environment > 0}, fitness
+#'   also depends on the difference between \code{envTrait} and \code{env}.
+#'
+#'   Surviving individuals appear in several rows; account for this, e.g., with a
+#'   random effect for \code{id}.
 #'
 #' @return A data frame with the columns
 #'   \describe{
@@ -47,7 +51,7 @@
 #' @export
 getMortalityData <- function(simu, radius = NULL) {
   if (!inherits(simu, "PhyloSim")) { # list of simulations, e.g. from runSimulationBatch
-    if (!is.list(simu) || !all(sapply(simu, inherits, "PhyloSim"))) stop("simu must be a PhyloSim object or a list of them")
+    if (!is.list(simu) || !length(simu) || !all(sapply(simu, inherits, "PhyloSim"))) stop("simu must be a PhyloSim object or a list of them")
     tabs <- lapply(simu, getMortalityData, radius = radius)
     run <- if (is.null(names(simu))) seq_along(simu) else names(simu)
     out <- cbind(run = rep(run, sapply(tabs, nrow)), do.call(rbind, tabs))
@@ -61,7 +65,7 @@ getMortalityData <- function(simu, radius = NULL) {
   off <- getCircularOffsets(radius)
   off <- off[off$dx %% nx != 0 | off$dy %% ny != 0, , drop = FALSE] # skip the focal cell also if the neighborhood wraps around it
   row <- c(row(out[[1]]$specMat)); col <- c(col(out[[1]]$specMat))
-  nb <- vapply(seq_len(nrow(off)), function(k) (row - 1 + off$dy[k]) %% ny + 1 + ((col - 1 + off$dx[k]) %% nx) * ny, numeric(length(row)))
+  nb <- vapply(seq_len(nrow(off)), function(k) (row - 1L + off$dy[k]) %% ny + 1L + ((col - 1L + off$dx[k]) %% nx) * ny, integer(length(row)))
   id <- seq_along(row)
   tabs <- vector("list", length(out) - 1)
   for (i in seq_along(tabs)) {
@@ -69,7 +73,7 @@ getMortalityData <- function(simu, radius = NULL) {
     died <- c(out[[i + 1]]$traitMat != o$traitMat)
     tabs[[i]] <- data.frame(census = simu$Model$runs[i], interval = simu$Model$runs[i + 1] - simu$Model$runs[i],
                             id = id, x = col, y = row, species = c(o$specMat),
-                            con = rowSums(matrix(o$specMat[nb] == c(o$specMat), nrow = length(row))),
+                            con = as.integer(rowSums(matrix(o$specMat[nb] == c(o$specMat), nrow = length(row)))),
                             compTrait = c(o$compMat), envTrait = c(o$traitMat), env = c(o$envMat), died = died)
     id[died] <- max(id) + seq_len(sum(died)) # new individuals get new IDs
   }

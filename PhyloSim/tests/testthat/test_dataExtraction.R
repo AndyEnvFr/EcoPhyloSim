@@ -64,4 +64,5 @@ test_that("getMortalityData works with lists and needs two recorded generations"
   one <- runSimulation(createCompletePar(x = 10, y = 10, runs = 10))
   expect_error(getMortalityData(one), "two recorded generations")
   expect_error(getMortalityData(5), "PhyloSim object")
+  expect_error(getMortalityData(list()), "PhyloSim object")
 })

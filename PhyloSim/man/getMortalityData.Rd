@@ -52,7 +52,11 @@ In the model, density dependence acts through the competition trait
 absolute difference in this trait to the neighbors. The number of
 conspecific neighbors \code{con} is therefore only a proxy. As the grid is
 always full, the number of heterospecific neighbors is the number of cells
-in the neighborhood minus \code{con}.
+in the neighborhood minus \code{con}. With \code{environment > 0}, fitness
+also depends on the difference between \code{envTrait} and \code{env}.
+
+Surviving individuals appear in several rows; account for this, e.g., with a
+random effect for \code{id}.
 }
 \examples{
 # Local dispersal and density dependence, burn-in of 300 generations,
