@@ -156,9 +156,9 @@ Landscape::Landscape(int xsize, int ysize, int type, bool neutral, bool dd, bool
         for (int i = 0; i < m_Xdimensions; i++) {
             for (int j = 0; j < m_Ydimensions; j++) {
                 std::pair<double, double> envi;
-                envi.first = airmat[i * m_Xdimensions + j];
+                envi.first = airmat[i * m_Ydimensions + j]; // fixes #122 (airmat index for x != y)
                 if (soilmat.size() > 1) {
-                    envi.second = soilmat[i * m_Xdimensions + j];
+                    envi.second = soilmat[i * m_Ydimensions + j];
                 } else envi.second = 1.0;
                 m_Environment.push_back(envi);
             }
