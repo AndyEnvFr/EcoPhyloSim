@@ -44,7 +44,7 @@ sac <- function(simu, which.result = NULL, size = NULL, rep=50, plot=T, title="S
     landscapeDim = dim(matrix)
     landscapeArea = landscapeDim[1] * landscapeDim[2]
     if (is.null(size)){
-      size = as.integer(seq(2, sqrt(landscapeArea),len = 10))
+      size = unique(as.integer(round(exp(seq(log(2), log(sqrt(landscapeArea)), length.out = 10)))))
     }
     
     

@@ -50,3 +50,7 @@ You can install directly from gh, using the ‘devtools’ package:
     ## 8  1521   12.13      13.05      11.00
     ## 9  1936   13.11      14.00      12.00
     ## 10 2500   14.00      14.00      14.00
+
+### Contributing
+
+Questions, bug reports and contributions are welcome. Please read the [contributing guidelines](CONTRIBUTING.md) before opening an issue or pull request, in particular the policy on AI-generated contributions (see also the [instructions for AI coding agents](AGENTS.md)).
