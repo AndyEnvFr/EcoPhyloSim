@@ -1,76 +1,67 @@
-context("data extraction functions")
+context("getMortalityData")
 
 set.seed(1)
-par <- createCompletePar(x = 20, y = 15, dispersal = 1, runs = c(10, 11, 12), # non-square grid
+par <- createCompletePar(x = 20, y = 15, dispersal = 1, runs = c(10, 11, 13), # non-square grid
                          density = 1, densityCut = 2, scenario = "test")
 simu <- runSimulation(par)
 
-test_that("getCircularOffsets matches the C++ neighbourhood", {
-  expect_equal(nrow(getCircularOffsets(1)), 4)
-  expect_equal(nrow(getCircularOffsets(3)), 28)
-  expect_equal(nrow(getCircularOffsets(0)), 0)
-  expect_error(getCircularOffsets(1.5))
-})
-
-test_that("getTorusMatrix wraps around, also for r = 0 and r > size", {
-  m <- matrix(1:6, 2, 3)
-  expect_identical(PhyloSim:::getTorusMatrix(m, 0), m)
-  big <- PhyloSim:::getTorusMatrix(m, 1)
-  expect_identical(dim(big), c(4L, 5L))
-  expect_identical(big[1, 1], m[2, 3])
-  expect_identical(PhyloSim:::getTorusMatrix(m, 4), m[rep(1:2, 5), c(3, rep(1:3, 3), 1)])
-})
-
-test_that("getConNeigh counts conspecific neighbours on the torus", {
-  res <- getConNeigh(simu)
-  sp <- simu$Output[[1]]$specMat
-  off <- getCircularOffsets(2)
-  ref <- matrix(0, nrow(sp), ncol(sp))
-  for (i in seq_len(nrow(sp))) for (j in seq_len(ncol(sp))) for (k in seq_len(nrow(off))) {
-    ref[i, j] <- ref[i, j] + (sp[(i - 1 + off$dx[k]) %% nrow(sp) + 1,
-                                 (j - 1 + off$dy[k]) %% ncol(sp) + 1] == sp[i, j])
+# conspecific neighbors as in Landscape::densityUpdate (Grid.cpp), cell (x, y) = mat[y + 1, x + 1]
+bruteCon <- function(sp, r) {
+  X <- ncol(sp); Y <- nrow(sp); con <- matrix(0, Y, X)
+  for (x in 0:(X - 1)) for (y in 0:(Y - 1)) for (dx in -r:r) {
+    yl <- floor(sqrt(r^2 - dx^2))
+    for (dy in -yl:yl) {
+      nx <- (x + dx) %% X; ny <- (y + dy) %% Y
+      if (!(nx == x && ny == y)) con[y + 1, x + 1] <- con[y + 1, x + 1] + (sp[y + 1, x + 1] == sp[ny + 1, nx + 1])
+    }
   }
-  expect_equal(res$Output[[1]]$conNeighMat, ref, check.attributes = FALSE)
-  expect_identical(res$Output[[1]]$specMat, sp)
-  expect_identical(res$Model$getName, getNames(simu))
+  c(con)
+}
+
+test_that("getCircularOffsets matches the C++ neighborhood", {
+  expect_equal(nrow(PhyloSim:::getCircularOffsets(1)), 4)
+  expect_equal(nrow(PhyloSim:::getCircularOffsets(3)), 28)
+  expect_equal(nrow(PhyloSim:::getCircularOffsets(0)), 0)
+  expect_error(PhyloSim:::getCircularOffsets(1.5))
 })
 
-test_that("getMortality, getID and getMatToTab are consistent", {
-  res <- getConNeigh(simu)
-  expect_identical(names(res$Output), c("10", "11", "12"))
-  expect_true(all(is.na(res$Output[[1]]$mortMat)))
-  changed <- res$Output[[2]]$mortMat
-  expect_true(any(changed) && any(!changed))
-  expect_identical(changed, res$Output[[2]]$neutMat != res$Output[[1]]$neutMat) # neutral marker also changes at birth
-  expect_equal(res$Output[[2]]$idMat[!changed], res$Output[[1]]$idMat[!changed])
-  expect_false(any(res$Output[[2]]$idMat[changed] %in% res$Output[[1]]$idMat))
-  tab <- getMatToTab(res)
-  expect_equal(nrow(tab), 2 * 300)
-  expect_identical(dim(res$Output[[1]]$idMat), dim(res$Output[[1]]$specMat))
-  expect_identical(dim(res$Output[[1]]$mortMat), dim(res$Output[[1]]$specMat))
-  expect_identical(tab$mortNextGen[1:300], as.vector(res$Output[[2]]$mortMat))
-  expect_error(getMatToTab(simu), "getConNeigh")
+test_that("getMortalityData counts conspecific neighbors on the torus", {
+  dat <- getMortalityData(simu)
+  expect_equal(nrow(dat), 2 * 20 * 15)
+  expect_equal(unique(dat$census), c(10, 11))
+  expect_equal(unique(dat$interval), c(1, 2))
+  for (i in 1:2) {
+    expect_equal(dat$con[dat$census == par$runs[i]], bruteCon(simu$Output[[i]]$specMat, 2))
+  }
+  expect_equal(getMortalityData(simu, radius = 1)$con[1:300], bruteCon(simu$Output[[1]]$specMat, 1))
+  expect_true(all(getMortalityData(simu, radius = 0)$con == 0))
+  # many species on a 7 x 4 grid; radius 4 wraps onto the focal cell, which is not counted, as in C++
+  set.seed(2)
+  mat <- function() matrix(sample(1:3, 28, replace = TRUE), nrow = 4, ncol = 7)
+  fake <- structure(list(Model = list(runs = c(1, 2), densityCut = 2),
+                         Output = lapply(1:2, function(i) list(specMat = mat(), traitMat = mat(), compMat = mat(), envMat = mat()))),
+                    class = "PhyloSim")
+  for (r in 1:4) expect_equal(getMortalityData(fake, radius = r)$con, bruteCon(fake$Output[[1]]$specMat, r))
 })
 
-test_that("functions work with one recorded generation and with lists", {
-  one <- runSimulation(createCompletePar(x = 10, y = 10, dispersal = 1, runs = 5,
-                                         density = 1, scenario = "one"))
-  expect_equal(nrow(getMatToTab(getConNeigh(one))), 0)
-  lst <- createPhylosimList(list(simu, one))
-  expect_length(getNames(lst), 2)
-  expect_s3_class(getConNeigh(lst), "PhylosimList")
-  expect_identical(names(getConNeigh(createPhylosimList(list(a = simu, b = one)))), c("a", "b"))
-  expect_length(getSpecTime(lst, plot = FALSE), 2)
-  tab <- getMatToTab(getConNeigh(createPhylosimList(list(simu, simu))))
-  expect_identical(unique(tab$run), 1:2)
-  expect_equal(nrow(tab), 2 * 2 * 300)
+test_that("getMortalityData gives deaths and individual IDs", {
+  dat <- getMortalityData(simu)
+  d1 <- dat[dat$census == 10, ]; d2 <- dat[dat$census == 11, ]
+  expect_equal(d1$died, c(simu$Output[[2]]$traitMat != simu$Output[[1]]$traitMat))
+  expect_equal(d1$envTrait, c(simu$Output[[1]]$traitMat))
+  expect_equal(d1$species, c(simu$Output[[1]]$specMat))
+  expect_true(any(d1$died) && any(!d1$died))
+  expect_equal(d2$id[!d1$died], d1$id[!d1$died]) # survivors keep their ID
+  expect_false(any(d2$id[d1$died] %in% d1$id)) # new individuals get new IDs
+  expect_false(anyDuplicated(d2$id) > 0)
 })
 
-test_that("getNames works if optional parameters are missing", {
-  s <- simu
-  s$Model$fission <- NULL
-  s$Model$redQueen <- NULL
-  expect_identical(getNames(s), getNames(simu))
-  s$Model$fitnessActsOn <- "both"
-  expect_match(getNames(s), "faoB")
+test_that("getMortalityData works with lists and needs two recorded generations", {
+  lst <- getMortalityData(list(a = simu, b = simu))
+  expect_equal(names(lst)[1], "run")
+  expect_equal(lst$run, rep(c("a", "b"), each = 600))
+  expect_equal(unique(getMortalityData(list(simu, simu))$run), 1:2)
+  one <- runSimulation(createCompletePar(x = 10, y = 10, runs = 10))
+  expect_error(getMortalityData(one), "two recorded generations")
+  expect_error(getMortalityData(5), "PhyloSim object")
 })

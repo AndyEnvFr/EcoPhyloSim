@@ -5,6 +5,7 @@
 * New pipeline for large simulation experiments: `runPhylosimAnalysis()` runs many simulations with fixed and prior-drawn parameters and saves them in chunks; `chunkwiseCalculateSummaries()`, `chunkwiseCleanup()`, `combineCunks()`, `prepareForAnalysis()` and `extractParams()` process the results (#85).
 * New functions `rejectionSample()` and `rejectionSamplePhylosimAnalysis()` for ABC rejection sampling on simulation outputs (#85).
 * New functions `getSpecies()` and `getSpeciesTraits()` extract the extant species and their traits from a simulation (#85).
+* New function `getMortalityData()` returns, for each individual and census interval, its species, number of conspecific neighbors and whether it died before the next recorded generation, for analyses of conspecific negative density dependence (@AndyEnvFr, #100).
 * `calculateSummaryStatistics()` returns additional statistics (Clark-Evans index, 8-neighbor index, environmental response coefficients) (#85).
 
 ## Changes
